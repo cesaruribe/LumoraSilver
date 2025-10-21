@@ -1,0 +1,57 @@
+{% extends 'core/menu.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Título y acción -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-balance-scale me-2"></i> Unidades de Medida
+        </h2>
+        <a href="{% url 'unidadesnew' %}" class="btn btn-outline-primary btn-sm" aria-label="Crear nueva unidad">
+            <i class="fas fa-plus me-1"></i> Nueva Unidad
+        </a>
+    </div>
+
+    <!-- Tabla de unidades -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="text-nowrap">Nombre</th>
+                            <th scope="col" class="text-nowrap">Símbolo</th>
+                            <th scope="col" class="text-center text-nowrap">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for unidad in unidades %}
+                        <tr>
+                            <td>{{ unidad.nombre }}</td>
+                            <td>{{ unidad.simbolo|default:"-" }}</td>
+                            <td class="text-center text-nowrap">
+                                <a href="{% url 'unidadesedit' unidad.id %}" class="btn btn-sm btn-outline-primary me-2" title="Editar {{ unidad.nombre }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'unidadesdelete' unidad.id %}" class="btn btn-sm btn-outline-danger" title="Eliminar {{ unidad.nombre }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4">
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle me-2"></i> No se encontraron unidades registradas.
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
