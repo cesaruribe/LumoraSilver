@@ -6,10 +6,10 @@
     <!-- Encabezado -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">
-            <i class="fas fa-balance-scale me-2"></i> Nueva Unidad de Medida
+            <i class="fas fa-tags me-2"></i> Nueva Categoria de Producto
         </h2>
-        <a href="{% url 'productos:unidadesshow' %}" class="btn btn-outline-secondary btn-sm" title="Volver al listado">
-            <i class="fas fa-arrow-left me-1"></i> Volver
+        <a href="{% url 'productos:categoriasshow' %}" class="btn btn-outline-secondary btn-sm" title="Volver al listado">
+            <i class="fas fa-plus me-1"></i> Volver
         </a>
     </div>
 
@@ -32,13 +32,13 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="{{ form.simbolo.id_for_label }}" class="form-label">
-                        Símbolo
+                    <label for="{{ form.slug.id_for_label }}" class="form-label">
+                        Slug
                     </label>
-                    {{ form.simbolo }}
-                    {% if form.simbolo.errors %}
+                    {{ form.slug }}
+                    {% if form.slug.errors %}
                         <div class="invalid-feedback d-block">
-                            {{ form.simbolo.errors.as_text }}
+                            {{ form.slug.errors.as_text }}
                         </div>
                     {% endif %}
                     <small class="form-text text-muted">Opcional</small>
@@ -46,11 +46,11 @@
 
                 <!-- Botones -->
                 <div class="d-flex justify-content-end gap-3 mt-4">
-                    <a href="{% url 'productos:unidadesshow' %}" class="btn btn-secondary btn-sm" title="Cancelar y volver">
+                    <a href="{% url 'productos:categoriasshow' %}" class="btn btn-secondary btn-sm" title="Cancelar y volver">
                         <i class="fas fa-times me-1"></i> Cancelar
                     </a>
-                    <button type="submit" class="btn btn-primary btn-sm" aria-label="Guardar nueva unidad">
-                        <i class="fas fa-save me-1"></i> Guardar Unidad
+                    <button type="submit" class="btn btn-primary btn-sm" aria-label="Guardar nueva Categoria">
+                        <i class="fas fa-save me-1"></i> Guardar Categoria
                     </button>
                 </div>
             </form>

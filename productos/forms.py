@@ -15,9 +15,10 @@ class UnidadMedidaForm(forms.ModelForm):
 class CategoriaForm(forms.ModelForm):
     class Meta:
         model = Categoria
-        fields = ['nombre']
+        fields = ['nombre','slug']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'slug': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 # Formulario para Producto

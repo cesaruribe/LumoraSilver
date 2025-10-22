@@ -21,14 +21,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('core.urls')),  # Página principal y menú
-    path('productos/', include(('productos.urls', 'productos'), namespace='productos')),
-    path('carrito/', include(('carrito.urls', 'carrito'), namespace='carrito')),
-    path('cuentas/', include(('cuentas.urls', 'cuentas'), namespace='cuentas')),
-    path('pedidos/', include(('pedidos.urls', 'pedidos'), namespace='pedidos')),
+    # Manejo de Unidades
+   # path('unidades/new/', views.unidadesNew, name='unidadesnew'),
+   # path('unidades/show/', views.unidadesShow, name='unidadesshow'),
+   # path('unidades/edit/<int:id>/', views.unidadesEdit, name='unidadesedit'),
+   # path('unidades/update/<int:id>/', views.unidadesUpdate, name='unidadesupdate'),
+   # path('unidades/delete/<int:id>/', views.unidadesDestroy, name='unidadesdelete'),
 ]
-
 # Solo para servir archivos multimedia durante el desarrollo
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

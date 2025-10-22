@@ -6,14 +6,14 @@
     <!-- Título y acción -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">
-            <i class="fas fa-balance-scale me-2"></i> Unidades de Medida
+            <i class="fas fa-tags me-2"></i> Categorias de Producto
         </h2>
-        <a href="{% url 'productos:unidadesnew' %}" class="btn btn-outline-primary btn-sm" aria-label="Crear nueva unidad">
-            <i class="fas fa-plus me-1"></i> Nueva Unidad
+        <a href="{% url 'productos:categoriasnew' %}" class="btn btn-outline-primary btn-sm" aria-label="Crear nueva categoria">
+            <i class="fas fa-plus me-1"></i> Nueva Categoria
         </a>
     </div>
 
-    <!-- Tabla de unidades -->
+    <!-- Tabla de categorias -->
     <div class="card shadow-sm border-0">
         <div class="card-body">
             <div class="table-responsive">
@@ -21,37 +21,37 @@
                     <thead class="table-light">
                         <tr>
                             <th scope="col" class="text-nowrap">Nombre</th>
-                            <th scope="col" class="text-nowrap">Símbolo</th>
+                            <th scope="col" class="text-nowrap">Slug</th>
                             <th scope="col" class="text-center text-nowrap">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for unidad in unidades %}
+                        {% for categoria in categorias %}
                         <tr>
-                            <td>{{ unidad.nombre }}</td>
-                            <td>{{ unidad.simbolo|default:"-" }}</td>
+                            <td>{{ categoria.nombre }}</td>
+                            <td>{{ categoria.slug|default:"-" }}</td>
                             <td class="text-center text-nowrap">
-                                <a href="{% url 'productos:unidadesedit' unidad.id %}" class="btn btn-sm btn-outline-primary me-2" title="Editar {{ unidad.nombre }}">
+                                <a href="{% url 'productos:categoriasedit' categoria.id %}" class="btn btn-sm btn-outline-primary me-2" title="Editar {{ categoria.nombre }}">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <!-- Botón que activa el modal -->
-                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDelete{{ unidad.id }}" title="Eliminar {{ unidad.nombre }}">
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDelete{{ categoria.id }}" title="Eliminar {{ categoria.nombre }}">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                                 <!-- Modal de confirmación -->
-                                <div class="modal fade" id="confirmDelete{{ unidad.id }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ unidad.id }}" aria-hidden="true">
+                                <div class="modal fade" id="confirmDelete{{ categoria.id }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ categoria.id }}" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="confirmDeleteLabel{{ unidad.id }}">Confirmar eliminación</h5>
+                                                <h5 class="modal-title" id="confirmDeleteLabel{{ categoria.id }}">Confirmar eliminación</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                             </div>
                                             <div class="modal-body text-wrap">
-                                                ¿Estás seguro de que deseas eliminar la unidad <strong>{{ unidad.nombre }}</strong>? Esta acción no se puede deshacer.
+                                                ¿Estás seguro de que deseas eliminar la categoria <strong>{{ categoria.nombre }}</strong>? Esta acción no se puede deshacer.
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                                                <a href="{% url 'productos:unidadesdelete' unidad.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                                                <a href="{% url 'productos:categoriasdelete' categoria.id %}" class="btn btn-danger btn-sm">Eliminar</a>
                                             </div>
                                         </div>
                                     </div>
@@ -63,7 +63,7 @@
                         <tr>
                             <td colspan="3" class="text-center py-4">
                                 <div class="alert alert-info mb-0">
-                                    <i class="fas fa-info-circle me-2"></i> No se encontraron unidades registradas.
+                                    <i class="fas fa-info-circle me-2"></i> No se encontraron categorias registradas.
                                 </div>
                             </td>
                         </tr>

@@ -8,14 +8,14 @@
         <h2 class="mb-0">
             <i class="fas fa-balance-scale me-2"></i> Editar Unidad: {{ unidades.nombre }}
         </h2>
-        <a href="{% url 'unidadesshow' %}" class="btn btn-outline-secondary btn-sm" title="Volver al listado">
+        <a href="{% url 'productos:unidadesshow' %}" class="btn btn-outline-secondary btn-sm" title="Volver al listado">
             <i class="fas fa-arrow-left me-1"></i> Volver
         </a>
     </div>
     <!-- Formulario -->
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form method="POST" action="{% url 'unidadesupdate' unidades.id %}" class="needs-validation" novalidate>
+            <form method="POST" action="{% url 'productos:unidadesupdate' unidades.id %}" class="needs-validation" novalidate>
                 {% csrf_token %}
 
                 <div class="mb-3">
@@ -45,7 +45,7 @@
 
                 <!-- Botones -->
                 <div class="d-flex justify-content-end gap-3 mt-4">
-                    <a href="{% url 'unidadesshow' %}" class="btn btn-secondary btn-sm" title="Cancelar y volver">
+                    <a href="{% url 'productos:unidadesshow' %}" class="btn btn-secondary btn-sm" title="Cancelar y volver">
                         <i class="fas fa-times me-1"></i> Cancelar
                     </a>
                     <button type="submit" class="btn btn-primary btn-sm" aria-label="Actualizar unidad">

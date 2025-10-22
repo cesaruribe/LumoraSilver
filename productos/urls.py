@@ -15,18 +15,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path
 from core import views
+from productos import views
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('core.urls')),  # Página principal y menú
-    path('productos/', include(('productos.urls', 'productos'), namespace='productos')),
-    path('carrito/', include(('carrito.urls', 'carrito'), namespace='carrito')),
-    path('cuentas/', include(('cuentas.urls', 'cuentas'), namespace='cuentas')),
-    path('pedidos/', include(('pedidos.urls', 'pedidos'), namespace='pedidos')),
+    # Manejo de Unidades
+    path('unidades/new/', views.unidadesNew, name='unidadesnew'),
+    path('unidades/show/', views.unidadesShow, name='unidadesshow'),
+    path('unidades/edit/<int:id>/', views.unidadesEdit, name='unidadesedit'),
+    path('unidades/update/<int:id>/', views.unidadesUpdate, name='unidadesupdate'),
+    path('unidades/delete/<int:id>/', views.unidadesDestroy, name='unidadesdelete'),
+    # Manejo de Categorias
+    path('categorias/new/', views.categoriasNew, name='categoriasnew'),
+    path('categorias/show/', views.categoriasShow, name='categoriasshow'),
+    path('categorias/edit/<int:id>/', views.categoriasEdit, name='categoriasedit'),
+    path('categorias/update/<int:id>/', views.categoriasUpdate, name='categoriasupdate'),
+    path('categorias/delete/<int:id>/', views.categoriasDestroy, name='categoriasdelete'),
 ]
 
 # Solo para servir archivos multimedia durante el desarrollo
