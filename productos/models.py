@@ -41,6 +41,7 @@ class Categoria(models.Model):
 # *************************************************
 class Producto(models.Model):
     id = models.AutoField(primary_key=True)
+    codigo = models.CharField(max_length=10, unique=True)   
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField()
     
@@ -79,4 +80,4 @@ class Producto(models.Model):
         verbose_name = 'Producto'
         verbose_name_plural = 'Productos'
         # Para evitar productos duplicados
-        unique_together = ['nombre', 'categoria']
+        unique_together = ['nombre', 'categoria', 'codigo']

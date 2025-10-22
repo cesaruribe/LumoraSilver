@@ -19,6 +19,20 @@
             <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                 {% csrf_token %}
 
+                <!-- Código -->
+                <div class="mb-3">
+                    <label for="{{ form.codigo.id_for_label }}" class="form-label">
+                        Código <span class="text-danger">*</span>
+                    </label>
+                    {{ form.codigo }}
+                    {% if form.codigo.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.codigo.errors.as_text }}
+                        </div>
+                    {% endif %}
+                    <small class="form-text text-muted">Debe ser único para cada producto.</small>
+                </div>
+
                 <!-- Nombre -->
                 <div class="mb-3">
                     <label for="{{ form.nombre.id_for_label }}" class="form-label">
@@ -118,6 +132,7 @@
                             {{ form.imagen.errors.as_text }}
                         </div>
                     {% endif %}
+                    <small class="form-text text-muted">Formatos permitidos: JPG, PNG. Tamaño máximo recomendado: 2MB.</small>
                 </div>
 
                 <!-- Stock y Activo -->
