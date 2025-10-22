@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from productos.models import UnidadMedida, Categoria, Producto
-from productos.forms import UnidadMedidaForm, CategoriaForm
+from productos.forms import UnidadMedidaForm, CategoriaForm, ProductoForm
 from django.db import IntegrityError
 
 # Vistas para Productos
@@ -140,3 +140,70 @@ def categoriasDestroy(request, id):
     except IntegrityError:
         messages.warning(request, "No se puede eliminar la categoria porque está referenciada por otros registros.")
     return redirect('productos:categoriasshow')
+#  *************************************************************
+#         MANEJO DE PRODUCTOS
+#   SE USA EL SISTEMA DE MESAJE DE DJANGO PARA NOTIFICACIONES 
+#  *************************************************************
+def productosNew(request):
+    if request.method == "POST":
+        form = ProductoForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Producto creado exitosamente.")
+                return redirect('productos:productosshow')
+            except Exception as e:
+                messages.error(request, f"Error al guardar el Producto: {e}")
+        else:
+            messages.warning(request, "Por favor corrige los errores del formulario.")
+    else:
+        form = ProductoForm()
+    
+    return render(request, 'productos/productosNew.html', {
+        'form': form
+    })
+
+def productosShow(request):
+    producto = Producto.objects.all()
+    return render(request, 'productos/productosShow.html', {
+        'productos': producto
+    })
+
+def productosEdit(request, id):
+    producto = get_object_or_404(Producto, pk=id)
+    form = ProductoForm(instance=producto)
+    return render(request, 'productos/productosEdit.html', {
+        'form': form,
+        'productos': producto
+    })
+
+def productosUpdate(request, id):
+    producto = get_object_or_404(Producto, pk=id)
+    if request.method == "POST":
+        form = ProductoForm(request.POST, request.FILES, instance=producto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Producto actualizado correctamente.")
+            return redirect('productos:productosshow')
+        else:
+            messages.warning(request, "Por favor corrige los errores del formulario.")
+            return render(request, 'productos/productosEdit.html', {
+                'form': form,
+                'producto': producto
+            })
+    else:
+        form = ProductoForm(instance=producto)
+
+    return render(request, 'productos/productosEdit.html', {
+        'form': form,
+        'producto': producto
+    })
+
+def productosDestroy(request, id):
+    producto = get_object_or_404(Producto, pk=id)
+    try:
+        producto.delete()
+        messages.success(request, "Producto eliminado correctamente.")
+    except IntegrityError:
+        messages.warning(request, "No se puede eliminar el Producto porque está referenciada por otros registros.")
+    return redirect('productos:productosshow')

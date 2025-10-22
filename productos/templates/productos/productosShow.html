@@ -1,0 +1,136 @@
+{% extends 'core/menu.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Título y acción -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-box-open me-2"></i> Productos Registrados
+        </h2>
+        <a href="{% url 'productos:productosnew' %}" class="btn btn-outline-primary btn-sm" aria-label="Crear nuevo producto">
+            <i class="fas fa-plus me-1"></i> Nuevo Producto
+        </a>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th class="text-end">Precio</th>
+                            <th class="text-end">Stock</th>
+                            <th class="text-center">Activo</th>
+                            <th class="text-center text-nowrap">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for producto in productos %}
+                        <tr>
+                            <td>{{ producto.nombre }}</td>
+                            <td>{{ producto.categoria.nombre }}</td>
+                            <td class="text-end">${{ producto.precio }}</td>
+                            <td class="text-end">{{ producto.stock }}</td>
+                            <td class="text-center">
+                                {% if producto.activo %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-danger"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center text-nowrap">
+                                <!-- Ver detalles -->
+                                <button type="button" class="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#detalleProducto{{ producto.id }}" title="Ver detalles de {{ producto.nombre }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+
+                                <!-- Editar -->
+                                <a href="{% url 'productos:productosedit' producto.id %}" class="btn btn-sm btn-outline-primary me-2" title="Editar {{ producto.nombre }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <!-- Eliminar -->
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDelete{{ producto.id }}" title="Eliminar {{ producto.nombre }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+
+                                <!-- Modal de detalle -->
+                                <div class="modal fade" id="detalleProducto{{ producto.id }}" tabindex="-1" aria-labelledby="detalleProductoLabel{{ producto.id }}" aria-hidden="true">
+                                  <div class="modal-dialog modal-lg modal-dialog-centered">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="detalleProductoLabel{{ producto.id }}">Detalles de {{ producto.nombre }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <div class="row g-3">
+                                          <!-- Imagen -->
+                                          {% if producto.imagen %}
+                                          <div class="col-md-5 text-center">
+                                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="img-fluid rounded shadow-sm" style="max-height: 300px; object-fit: contain;">
+                                          </div>
+                                          {% endif %}
+
+                                          <!-- Detalles -->
+                                          <div class="col-md-7">
+                                            <p><strong>Descripción:</strong></p>
+                                            <div class="border rounded p-2 bg-light" style="max-height: 150px; overflow-y: auto;">
+                                              {{ producto.descripcion|default:"Sin descripción" }}
+                                            </div>
+                                            <hr class="my-3">
+                                            <p><strong>Precio:</strong> ${{ producto.precio }}</p>
+                                            <p><strong>Stock:</strong> {{ producto.stock }}</p>
+                                            <p><strong>Categoría:</strong> {{ producto.categoria.nombre }}</p>
+                                            <p><strong>Tamaño:</strong> {{ producto.tamano|default:"-" }} {{ producto.unidad_tamano.nombre|default:"" }}</p>
+                                            <p><strong>Grosor:</strong> {{ producto.grosor|default:"-" }} {{ producto.unidad_grosor.nombre|default:"" }}</p>
+                                            <p><strong>Activo:</strong> {% if producto.activo %}Sí{% else %}No{% endif %}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <!-- Modal de confirmación de eliminación -->
+                                <div class="modal fade" id="confirmDelete{{ producto.id }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ producto.id }}" aria-hidden="true">
+                                  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmDeleteLabel{{ producto.id }}">Confirmar eliminación</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                      </div>
+                                      <div class="modal-body text-wrap">
+                                        ¿Estás seguro de que deseas eliminar el producto <strong>{{ producto.nombre }}</strong>? Esta acción no se puede deshacer.
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                                        <a href="{% url 'productos:productosdelete' producto.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle me-2"></i> No se encontraron productos registrados.
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

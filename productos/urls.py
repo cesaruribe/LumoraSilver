@@ -34,6 +34,12 @@ urlpatterns = [
     path('categorias/edit/<int:id>/', views.categoriasEdit, name='categoriasedit'),
     path('categorias/update/<int:id>/', views.categoriasUpdate, name='categoriasupdate'),
     path('categorias/delete/<int:id>/', views.categoriasDestroy, name='categoriasdelete'),
+    # Manejo de Productos
+    path('productos/new/', views.productosNew, name='productosnew'),
+    path('productos/show/', views.productosShow, name='productosshow'),
+    path('productos/edit/<int:id>/', views.productosEdit, name='productosedit'),
+    path('productos/update/<int:id>/', views.productosUpdate, name='productosupdate'),
+    path('productos/delete/<int:id>/', views.productosDestroy, name='productosdelete'),
 ]
 
 # Solo para servir archivos multimedia durante el desarrollo
