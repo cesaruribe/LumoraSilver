@@ -3,35 +3,39 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">
-            <i class="fas fa-map-marked-alt me-2"></i> Mis Direcciones
+            <i class="fas fa-map-marked-alt me-2"></i> Mis direcciones
         </h2>
-        <a href="{% url 'cuentas:direccion_nueva' %}" class="btn btn-outline-primary btn-sm">
-            <i class="fas fa-plus me-1"></i> Nueva Dirección
+        <a href="{% url 'cuentas:direccion_nueva' %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i> Nueva dirección
         </a>
     </div>
 
-    {% if direcciones %}
     <div class="row g-3">
         {% for direccion in direcciones %}
         <div class="col-md-6">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <h5 class="card-title">{{ direccion.etiqueta }}</h5>
-                    <p class="mb-1">{{ direccion.calle_numero }}, {{ direccion.ciudad }}</p>
-                    <p class="mb-1">{{ direccion.estado_provincia }}, {{ direccion.pais }}</p>
-                    <p class="mb-1">Código Postal: {{ direccion.codigo_postal }}</p>
-                    {% if direccion.es_predeterminada %}
-                        <span class="badge bg-success">Predeterminada</span>
-                    {% endif %}
+                    <p class="mb-1"><strong>{{ direccion.nombre }}</strong></p>
+                    <p class="mb-1">{{ direccion.calle }}, {{ direccion.ciudad }}</p>
+                    <p class="mb-1">{{ direccion.estado }} - {{ direccion.codigo_postal }}</p>
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+                        <a href="{% url 'cuentas:direccion_editar' direccion.id %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i> Editar
+                        </a>
+                        <a href="{% url 'cuentas:direccion_eliminar' direccion.id %}" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-trash me-1"></i> Eliminar
+                        </a>
+                    </div>
                 </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                No tienes direcciones registradas.
             </div>
         </div>
         {% endfor %}
     </div>
-    {% else %}
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle me-2"></i> No tienes direcciones registradas.
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

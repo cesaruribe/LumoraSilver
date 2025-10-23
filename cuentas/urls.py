@@ -22,6 +22,7 @@ app_name = 'cuentas'
 urlpatterns = [
     path('registro/', views.registro, name='registro'),
     path('perfil/', views.perfil, name='perfil'),
+    path('perfil/editar/', views.editarperfil, name='editarperfil'),
     path('direcciones/', views.direcciones, name='direcciones'),
     path('direcciones/nueva/', views.direccion_nueva, name='direccion_nueva'),
 ]

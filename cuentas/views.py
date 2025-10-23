@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from .forms import RegistroForm
 from django.contrib.auth.decorators import login_required
-from .forms import DireccionForm
+from .forms import DireccionForm, PerfilForm, RegistroForm
 from .models import Direccion
 
 def registro(request):
@@ -37,3 +36,15 @@ def direccion_nueva(request):
         direccion.save()
         return redirect('cuentas:direcciones')
     return render(request, 'cuentas/direcciones_form.html', {'form': form})
+
+@login_required
+def editarperfil(request):
+    usuario = request.user
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            return redirect('cuentas:perfil')
+    else:
+        form = PerfilForm(instance=usuario)
+    return render(request, 'cuentas/editarperfil.html', {'form': form})
