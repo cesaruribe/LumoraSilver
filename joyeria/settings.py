@@ -109,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+# Siempre que uses un modelo de usuario personalizado, debes indicarlo aquí
 AUTH_USER_MODEL = 'cuentas.CustomUser'
 
 # Internationalization

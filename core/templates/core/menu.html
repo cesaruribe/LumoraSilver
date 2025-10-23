@@ -5,123 +5,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú</title>
-    <!-- Favicon -->
     <link rel="icon" href="{% static 'images/logo.ico' %}" type="image/x-icon">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #34106e;">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'inicio' %}">
-                <img src="{% static 'images/logo.ico' %}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
-                Lumora Silver
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #34106e;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'inicio' %}">
+            <img src="{% static 'images/logo.ico' %}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+            Lumora Silver
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- Menú principal -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'inicio' %}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Catálogo</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Productos
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'productos:unidadesshow' %}">Unidades de Medida</a></li>
-                            <li><a class="dropdown-item" href="{% url 'productos:categoriasshow' %}">Categorias de Productos</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'productos:productosshow' %}">Productos Catalogo</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Categorías
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Anillos</a></li>
-                            <li><a class="dropdown-item" href="#">Collares</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Pulseras</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                         {% comment %} Enlaces de autenticación   "{% url 'login' %}" {% endcomment %}
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        {% comment %} Enlaces de registro  "{% url 'registro' %}" {% endcomment %}
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-person-plus"></i> Únete
-                        </a>
-                    </li>
-                </ul>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- Menú principal -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" href="{% url 'inicio' %}">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Catálogo</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Productos</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'productos:unidadesshow' %}">Unidades de Medida</a></li>
+                        <li><a class="dropdown-item" href="{% url 'productos:categoriasshow' %}">Categorías de Productos</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'productos:productosshow' %}">Productos Catálogo</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Categorías</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Anillos</a></li>
+                        <li><a class="dropdown-item" href="#">Collares</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Pulseras</a></li>
+                    </ul>
+                </li>
 
-                <!-- Íconos de usuario -->
-                <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        {% comment %} Enlace a la lista de deseos {% url 'deseos' %} {% endcomment %}
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-heart-fill"></i> Lista de deseos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        {% comment %} Enlace al carrito de compras "{% url 'carrito' %}" {% endcomment %}   
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-cart-fill"></i> Carrito
-                        </a>
-                    </li>
-                </ul>
-                <!-- Buscador -->
-                <form class="d-flex ms-3" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Buscar">
-                    <button class="btn btn-outline-light" type="submit">Buscar</button>
-                </form>
-            </div>
-        </div>
-    </nav>
-    <div class="content">
-        <div class="row">
-            <div class="col-md-12 ">
-                {% block content %}
-                {% endblock %}
-            </div>
+                {% if user.is_authenticated %}
+                <!-- Dropdown Mi Cuenta -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-fill me-1"></i> Hola, {{ user.first_name|default:user.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'cuentas:perfil' %}">
+                            <i class="bi bi-person-circle me-1"></i> Mi perfil</a></li>
+                        <li><a class="dropdown-item" href="{% url 'cuentas:direcciones' %}">
+                            <i class="bi bi-geo-alt me-1"></i> Mis direcciones</a></li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="bi bi-box-seam me-1"></i> Mis pedidos</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-start">
+                                    <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">
+                    <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'cuentas:registro' %}">
+                    <i class="bi bi-person-plus"></i> Únete</a></li>
+                {% endif %}
+            </ul>
+
+            <!-- Íconos de usuario -->
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-heart-fill"></i> Lista de deseos</a></li>
+                <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-cart-fill"></i> Carrito</a></li>
+            </ul>
+
+            <!-- Buscador -->
+            <form class="d-flex ms-3" role="search">
+                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Buscar">
+                <button class="btn btn-outline-light" type="submit">Buscar</button>
+            </form>
         </div>
     </div>
-</body>
-    <!--Codigo para usar el sistema de mensajes de Django Debe incluirse en views.py 
-        la linea de codigo "from django.contrib import messages" -->
-    {% if messages %}
-    <div class="container mt-3">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+</nav>
+
+<div class="content">
+    <div class="row">
+        <div class="col-md-12">
+            {% block content %}
+            {% endblock %}
         </div>
-        {% endfor %}
     </div>
-    {% endif %}
+</div>
+
+<!-- Sistema de mensajes -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 <footer class="text-center text-white" style="background-color: #34106e;">
     <div class="py-3 d-flex justify-content-center align-items-center gap-2">
         &copy; 2025 Partnet Web Design. All rights reserved.
         <img src="{% static 'images/PWD.ico' %}" alt="PWD Logo" width="20" height="20">
     </div>
-    {% comment %} Redes sociales {% endcomment %}
     <div class="py-2 d-flex justify-content-center gap-4">
         <a href="https://wa.me/584127747047" target="_blank" class="text-white text-decoration-none">
             <i class="bi bi-whatsapp"></i> WhatsApp
@@ -134,4 +131,5 @@
         </a>
     </div>
 </footer>
+</body>
 </html>

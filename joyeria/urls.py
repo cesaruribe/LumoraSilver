@@ -15,7 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.contrib.auth import views as auth_views
+from django.urls import path, include
 from core import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -25,10 +26,20 @@ urlpatterns = [
     path('', include('core.urls')),  # Página principal y menú
     path('productos/', include(('productos.urls', 'productos'), namespace='productos')),
     path('carrito/', include(('carrito.urls', 'carrito'), namespace='carrito')),
-    path('cuentas/', include(('cuentas.urls', 'cuentas'), namespace='cuentas')),
     path('pedidos/', include(('pedidos.urls', 'pedidos'), namespace='pedidos')),
+
+    # Autenticación
+    path('cuentas/login/', auth_views.LoginView.as_view(
+        template_name='cuentas/login.html',
+        redirect_authenticated_user=True,
+        next_page='cuentas:perfil'
+    ), name='login'),
+    path('cuentas/logout/', auth_views.LogoutView.as_view(next_page='inicio'), name='logout'),
+
+    # App cuentas
+    path('cuentas/', include(('cuentas.urls', 'cuentas'), namespace='cuentas')),
 ]
 
-# Solo para servir archivos multimedia durante el desarrollo
+# Archivos multimedia en desarrollo
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
