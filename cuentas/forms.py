@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, Direccion
+from django.contrib.auth.forms import AuthenticationForm
 
 class RegistroForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -31,7 +32,7 @@ class DireccionForm(forms.ModelForm):
                 'class': 'form-control form-control-sm',
                 'placeholder': field.label
             })
-            
+
 class PerfilForm(forms.ModelForm):
     class Meta:
         model = CustomUser
@@ -43,4 +44,16 @@ class PerfilForm(forms.ModelForm):
             field.widget.attrs.update({
                 'class': 'form-control form-control-sm',
                 'placeholder': field.label
+            })
+
+
+from django.contrib.auth.forms import AuthenticationForm
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super(LoginForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                'class': 'form-control form-control-sm'
+                # No usar 'placeholder' con form-floating
             })
