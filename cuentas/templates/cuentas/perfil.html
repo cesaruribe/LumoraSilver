@@ -1,25 +1,68 @@
-{% extends 'core/menu.html' %}
-{% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <h2 class="mb-4">
-                <i class="fas fa-user-circle me-2"></i> Mi perfil
-            </h2>
+{% extends "core/menu.html" %}
 
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
             <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <p><strong>Usuario:</strong> {{ user.username }}</p>
-                    <p><strong>Email:</strong> {{ user.email }}</p>
-                    <p><strong>Teléfono:</strong> {{ user.telefono }}</p>
-                    <div class="d-flex justify-content-end mt-3">
-                        <a href="{% url 'cuentas:editarperfil' %}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-edit me-1"></i> Editar perfil
-                        </a>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
                     </div>
+                    <h4 class="fw-bold">{{ user.get_full_name|default:user.username }}</h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <hr>
+                    <div class="text-start mb-3">
+                        <p class="mb-1 small text-muted">Teléfono:</p>
+                        <p class="fw-bold">{{ user.telefono|default:"No registrado" }}</p>
+                    </div>
+                    <a href="{% url 'cuentas:password_change' %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                        Cambiar Contraseña
+                    </a>
+                    <button class="btn btn-outline-danger btn-sm w-100" data-bs-toggle="modal" data-bs-target="#eliminarCuentaModal">
+                        Eliminar Cuenta
+                    </button>
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Mis Direcciones de Envío</h3>
+                <a href="{% url 'cuentas:agregar_direccion' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Nueva Dirección
+                </a>
+            </div>
+
+            {% if direcciones %}
+                <div class="row">
+                    {% for dir in direcciones %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100 border-{% if dir.es_predeterminada %}primary{% else %}light{% endif %} shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="fw-bold text-uppercase small text-muted">{{ dir.etiqueta }}</h6>
+                                    {% if dir.es_predeterminada %}
+                                        <span class="badge bg-primary">Predeterminada</span>
+                                    {% endif %}
+                                </div>
+                                <p class="mb-1">{{ dir.calle_numero }}</p>
+                                <p class="mb-0 small text-muted">{{ dir.ciudad }}, {{ dir.estado_provincia }}</p>
+                                <p class="small text-muted">{{ dir.pais }} ({{ dir.codigo_postal }})</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info border-0 shadow-sm">
+                    <i class="bi bi-info-circle me-2"></i> Aún no tienes direcciones registradas. Agrega una para agilizar tus compras.
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
+
+{% include "cuentas/_modal_eliminar_cuenta.html" %}
+
 {% endblock %}

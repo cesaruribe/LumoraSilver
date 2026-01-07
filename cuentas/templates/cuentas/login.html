@@ -1,48 +1,64 @@
-{% extends 'core/menu.html' %}
+{% extends "core/menu.html" %}
+{% load static %}
+
 {% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">
-                    <i class="fas fa-sign-in-alt me-2"></i> Iniciar sesión
-                </h2>
-                <a href="{% url 'cuentas:registro' %}" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-user-plus me-1"></i> Registrarse
-                </a>
-            </div>
+<div class="container py-5 d-flex justify-content-center">
+    <div class="card shadow-lg border-0" style="max-width: 450px; width: 100%; border-radius: 15px;">
+        
+        <div class="card-header bg-dark text-white text-center py-4" style="border-radius: 15px 15px 0 0;">
+            <h4 class="mb-0 fw-bold"><i class="bi bi-person-check me-2"></i> Bienvenid@</h4>
+            <small class="text-white-50">Ingresa para gestionar tus pedidos</small>
+        </div>
 
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <form method="POST" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.errors %}
-                                    <div class="invalid-feedback d-block">{{ field.errors.as_text }}</div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-
-                        <div class="d-flex justify-content-end gap-2 mt-3">
-                            <a href="{% url 'inicio' %}" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-times me-1"></i> Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                <i class="fas fa-sign-in-alt me-1"></i> Acceder
-                            </button>
-                        </div>
-                    </form>
+        <div class="card-body p-4">
+            
+            {% if form.errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Usuario o contraseña incorrectos.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            </div>
+            {% endif %}
 
-            <div class="text-center mt-3">
-                <small class="text-muted">
-                    ¿Olvidaste tu contraseña? <a href="#" class="text-decoration-none">Recupérala aquí</a>.
-                </small>
-            </div>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label fw-bold text-secondary">
+                        <i class="bi bi-person me-1"></i> Usuario o Email
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small">{{ form.username.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between">
+                        <label for="{{ form.password.id_for_label }}" class="form-label fw-bold text-secondary">
+                            <i class="bi bi-lock me-1"></i> Contraseña
+                        </label>
+                        <a href="{% url 'cuentas:password_reset' %}" class="small text-decoration-none">¿La olvidaste?</a>
+                    </div>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="text-danger small">{{ form.password.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
+                </button>
+            </form>
+        </div>
+
+        <div class="card-footer bg-light text-center py-3" style="border-radius: 0 0 15px 15px;">
+            <p class="mb-0 text-muted">
+                ¿Aún no tienes cuenta? 
+                <a href="{% url 'cuentas:registro' %}" class="fw-bold text-primary text-decoration-none">Regístrate ahora</a>
+            </p>
         </div>
     </div>
 </div>

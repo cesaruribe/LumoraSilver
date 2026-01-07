@@ -1,0 +1,92 @@
+{% extends "core/menu.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0" style="border-radius: 1rem;">
+                <div class="card-header bg-dark text-white py-3 text-center" style="border-radius: 1rem 1rem 0 0;">
+                    <h5 class="mb-0 fw-bold">📍 Nueva Dirección de Envío</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" id="formDireccion" data-url="{% url 'cuentas:ajax_municipios' %}" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">NOMBRE DE UBICACIÓN (EJ: CASA, TRABAJO)</label>
+                            {{ form.etiqueta }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">DIRECCIÓN (CALLE, CARRERA, AVENIDA # NÚMERO)</label>
+                            {{ form.calle_numero }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label fw-bold small">DEPARTAMENTO</label>
+                                {{ form.departamento }}
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label fw-bold small">MUNICIPIO / CIUDAD</label>
+                                {{ form.municipio }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small">CÓDIGO POSTAL</label>
+                            {{ form.codigo_postal }}
+                        </div>
+
+                        <div class="form-check form-switch mb-4 p-3 bg-light rounded border">
+                            {{ form.es_predeterminada }}
+                            <label class="form-check-label ms-2 fw-bold" for="{{ form.es_predeterminada.id_for_label }}">
+                                Establecer como dirección principal
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm py-2">
+                                <i class="bi bi-save me-2"></i> Guardar Dirección
+                            </button>
+                            <a href="{% url 'cuentas:perfil' %}" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("select_departamento").addEventListener("change", function() {
+        const url = document.getElementById("formDireccion").getAttribute("data-url");
+        const deptoId = this.value;
+
+        // Solo hacer la solicitud si se seleccionó un departamento
+        if (!deptoId) {
+            document.getElementById("select_municipio").innerHTML = '<option value="">Seleccione primero un departamento</option>';
+            return;
+        }
+
+        fetch(`${url}?departamento_id=${deptoId}`)
+            .then(response => response.json())
+            .then(data => {
+                const municipioSelect = document.getElementById("select_municipio");
+                let html_data = '<option value="">Seleccione un Municipio</option>';
+                
+                data.forEach(muni => {
+                    // CORRECCIÓN: Usar los campos correctos de la respuesta JSON
+                    html_data += `<option value="${muni.codigo_municipio}">${muni.nombre_municipio}</option>`;
+                });
+                
+                municipioSelect.innerHTML = html_data;
+                municipioSelect.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error al cargar municipios:', error);
+                document.getElementById("select_municipio").innerHTML = '<option value="">Error al cargar municipios</option>';
+            });
+    });
+</script>
+{% endblock %}

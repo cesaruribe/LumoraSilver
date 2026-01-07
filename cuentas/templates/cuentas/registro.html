@@ -1,52 +1,98 @@
-{% extends 'core/menu.html' %}
+{% extends "core/menu.html" %}
 {% load static %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">
-                    <i class="fas fa-user-plus me-2"></i> Crear Cuenta
-                </h2>
-                <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">
-                    <i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión
-                </a>
-            </div>
+<div class="container py-5 d-flex justify-content-center">
+    <div class="card shadow-lg border-0" style="max-width: 600px; width: 100%; border-radius: 15px;">
+        
+        <div class="card-header bg-primary text-white text-center py-4" style="border-radius: 15px 15px 0 0;">
+            <h3 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill me-2"></i> Crear Cuenta</h3>
+            <p class="mb-0 text-white-50">Únete a nuestra comunidad y gestiona tus compras fácilmente</p>
+        </div>
 
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <form method="POST" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        <div class="row g-3">
-                            {% for field in form %}
-                                <div class="col-md-6">
-                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                    {{ field }}
-                                    {% if field.errors %}
-                                        <div class="invalid-feedback d-block">{{ field.errors.as_text }}</div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
+        <div class="card-body p-4 p-md-5">
+            <form method="post" novalidate>
+                {% csrf_token %}
 
-                        <div class="d-flex justify-content-end gap-2 mt-4">
-                            <a href="{% url 'inicio' %}" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-times me-1"></i> Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                <i class="fas fa-user-check me-1"></i> Registrarse
-                            </button>
-                        </div>
-                    </form>
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold"><i class="bi bi-card-text me-1"></i> Nombres</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger small">{{ form.first_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Apellidos</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger small">{{ form.last_name.errors }}</div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
 
-            <div class="text-center mt-3">
-                <small class="text-muted">
-                    Al registrarte aceptas nuestros <a href="#" class="text-decoration-none">términos y condiciones</a>.
-                </small>
-            </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold"><i class="bi bi-person me-1"></i> Nombre de Usuario</label>
+                    {{ form.username }}
+                    <div class="form-text">Cómo te verás en nuestra plataforma.</div>
+                    {% if form.username.errors %}
+                        <div class="text-danger small">{{ form.username.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-7 mb-3">
+                        <label class="form-label fw-bold"><i class="bi bi-envelope me-1"></i> Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-5 mb-3">
+                        <label class="form-label fw-bold"><i class="bi bi-telephone me-1"></i> Teléfono</label>
+                        {{ form.telefono }}
+                        {% if form.telefono.errors %}
+                            <div class="text-danger small">{{ form.telefono.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr class="my-4 text-muted">
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold"><i class="bi bi-shield-lock me-1"></i> Contraseña</label>
+                    {{ form.password1 }}
+                    <div class="form-text small">Usa al menos 8 caracteres con letras y números.</div>
+                    {% if form.password1.errors %}
+                        <div class="text-danger small">{{ form.password1.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Confirmar Contraseña</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="text-danger small">{{ form.password2.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                        Registrarme y continuar
+                    </button>
+                    <a href="{% url 'cuentas:login' %}" class="btn btn-link text-decoration-none text-muted">
+                        ¿Ya tienes cuenta? Inicia sesión aquí
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-footer bg-light py-3 text-center" style="border-radius: 0 0 15px 15px;">
+            <small class="text-muted">
+                Al registrarte, aceptas nuestros <a href="#">Términos de Servicio</a> y <a href="#">Política de Privacidad</a>.
+            </small>
         </div>
     </div>
 </div>

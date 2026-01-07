@@ -24,7 +24,44 @@ class CustomUser(AbstractUser):
         verbose_name = "Usuario"
         verbose_name_plural = "Usuarios"
 
-# 2. Modelo de Direcciones (para envío y facturación)
+# 2. Modelo de Ubicación Geográfica
+class Departamento(models.Model):
+    codigo_departamento = models.IntegerField(primary_key=True)
+    nombre_departamento = models.CharField(max_length=56)
+
+    class Meta:
+        db_table = "departamento"
+        verbose_name = "Departamento"
+        verbose_name_plural = "Departamentos"
+
+    def __str__(self):
+        return self.nombre_departamento
+
+
+class Municipio(models.Model):
+    codigo_municipio = models.IntegerField(primary_key=True)
+    nombre_municipio = models.CharField(max_length=27)
+    tipo_municipio_isla_area_no_municipalizada = models.CharField(max_length=22)
+    longitud = models.CharField(max_length=10)
+    latitud = models.CharField(max_length=9)
+
+    # Relación con Departamento
+    codigo_departamento = models.ForeignKey(
+        Departamento,
+        on_delete=models.CASCADE,
+        db_column="codigo_departamento",
+        related_name="municipios"
+    )
+
+    class Meta:
+        db_table = "municipio"
+        verbose_name = "Municipio"
+        verbose_name_plural = "Municipios"
+
+    def __str__(self):
+        return f"{self.nombre_municipio} ({self.codigo_departamento.nombre_departamento})"
+
+# 3. Modelo de Direcciones (para envío y facturación)
 class Direccion(models.Model):
     """Almacena las diferentes direcciones de un usuario."""
     usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='direcciones', verbose_name="Usuario")
