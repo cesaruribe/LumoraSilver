@@ -41,10 +41,11 @@ class DireccionForm(forms.ModelForm):
     )
     
     municipio = forms.ModelChoiceField(
-        queryset=Municipio.objects.none(),
+        queryset=Municipio.objects.all(),  # CAMBIADO: No usar .none() aquí
         label="Municipio / Ciudad",
         empty_label="Seleccione primero un departamento",
-        widget=forms.Select(attrs={'class': 'form-select', 'id': 'select_municipio'})
+        widget=forms.Select(attrs={'class': 'form-select', 'id': 'select_municipio'}),
+        required=True
     )
 
     class Meta:
@@ -57,3 +58,20 @@ class DireccionForm(forms.ModelForm):
         for name, field in self.fields.items():
             if name not in ['departamento', 'municipio', 'es_predeterminada']:
                 field.widget.attrs.update({'class': 'form-control', 'placeholder': f'Ingrese {field.label.lower()}'})
+        
+        # Si es una instancia existente, cargar municipios del departamento correspondiente
+        if self.instance and self.instance.pk and self.instance.estado_provincia:
+            try:
+                depto = Departamento.objects.get(nombre_departamento=self.instance.estado_provincia)
+                self.fields['departamento'].initial = depto
+                self.fields['municipio'].queryset = Municipio.objects.filter(codigo_departamento=depto)
+                
+                # Buscar el municipio por nombre
+                muni = Municipio.objects.filter(
+                    nombre_municipio=self.instance.ciudad,
+                    codigo_departamento=depto
+                ).first()
+                if muni:
+                    self.fields['municipio'].initial = muni
+            except Departamento.DoesNotExist:
+                pass

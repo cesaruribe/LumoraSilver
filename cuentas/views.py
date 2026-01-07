@@ -62,11 +62,20 @@ def agregar_direccion(request):
             direccion.estado_provincia = departamento.nombre_departamento
             direccion.ciudad = municipio.nombre_municipio
             
+            # Si esta es la primera dirección, establecer como predeterminada
+            if not request.user.direcciones.exists():
+                direccion.es_predeterminada = True
+            
             direccion.save()
             messages.success(request, 'Dirección guardada exitosamente.')
             return redirect('cuentas:perfil')
+        else:
+            # Si el formulario no es válido, mostrar errores
+            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            print(form.errors)  # Para debug
     else:
         form = DireccionForm()
+    
     return render(request, 'cuentas/agregar_direccion.html', {'form': form})
 
 # Función para la carga dinámica vía AJAX

@@ -59,25 +59,32 @@
 </div>
 
 <script>
-    document.getElementById("select_departamento").addEventListener("change", function() {
-        const url = document.getElementById("formDireccion").getAttribute("data-url");
-        const deptoId = this.value;
-
-        // Solo hacer la solicitud si se seleccionó un departamento
+document.addEventListener('DOMContentLoaded', function() {
+    const departamentoSelect = document.getElementById("select_departamento");
+    const municipioSelect = document.getElementById("select_municipio");
+    const form = document.getElementById("formDireccion");
+    
+    // Inicializar municipios basados en departamento seleccionado (si hay)
+    function inicializarMunicipios() {
+        const deptoId = departamentoSelect.value;
+        const municipioId = municipioSelect.value; // Valor actual si existe
+        
         if (!deptoId) {
-            document.getElementById("select_municipio").innerHTML = '<option value="">Seleccione primero un departamento</option>';
+            municipioSelect.innerHTML = '<option value="">Seleccione primero un departamento</option>';
+            municipioSelect.disabled = true;
             return;
         }
-
+        
+        const url = form.getAttribute("data-url");
+        
         fetch(`${url}?departamento_id=${deptoId}`)
             .then(response => response.json())
             .then(data => {
-                const municipioSelect = document.getElementById("select_municipio");
                 let html_data = '<option value="">Seleccione un Municipio</option>';
                 
                 data.forEach(muni => {
-                    // CORRECCIÓN: Usar los campos correctos de la respuesta JSON
-                    html_data += `<option value="${muni.codigo_municipio}">${muni.nombre_municipio}</option>`;
+                    const selected = muni.codigo_municipio == municipioId ? 'selected' : '';
+                    html_data += `<option value="${muni.codigo_municipio}" ${selected}>${muni.nombre_municipio}</option>`;
                 });
                 
                 municipioSelect.innerHTML = html_data;
@@ -85,8 +92,36 @@
             })
             .catch(error => {
                 console.error('Error al cargar municipios:', error);
-                document.getElementById("select_municipio").innerHTML = '<option value="">Error al cargar municipios</option>';
+                municipioSelect.innerHTML = '<option value="">Error al cargar municipios</option>';
             });
+    }
+    
+    // Si ya hay un departamento seleccionado, cargar sus municipios
+    if (departamentoSelect.value) {
+        inicializarMunicipios();
+    }
+    
+    // Event listener para cambio de departamento
+    departamentoSelect.addEventListener("change", inicializarMunicipios);
+    
+    // Validación antes de enviar
+    form.addEventListener('submit', function(e) {
+        if (!departamentoSelect.value) {
+            e.preventDefault();
+            alert('Por favor selecciona un departamento');
+            departamentoSelect.focus();
+            return false;
+        }
+        
+        if (!municipioSelect.value) {
+            e.preventDefault();
+            alert('Por favor selecciona un municipio');
+            municipioSelect.focus();
+            return false;
+        }
+        
+        return true;
     });
+});
 </script>
 {% endblock %}
