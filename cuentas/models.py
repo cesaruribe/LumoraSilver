@@ -62,6 +62,8 @@ class Municipio(models.Model):
         return f"{self.nombre_municipio} ({self.codigo_departamento.nombre_departamento})"
 
 # 3. Modelo de Direcciones (para envío y facturación)
+# En cuentas/models.py
+
 class Direccion(models.Model):
     """Almacena las diferentes direcciones de un usuario."""
     usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='direcciones', verbose_name="Usuario")
@@ -70,7 +72,7 @@ class Direccion(models.Model):
     ciudad = models.CharField(max_length=100)
     estado_provincia = models.CharField(max_length=100)
     codigo_postal = models.CharField(max_length=10)
-    pais = models.CharField(max_length=50, default="Colombia") # O el país de venta
+    pais = models.CharField(max_length=50, default="Colombia")
     es_predeterminada = models.BooleanField(default=False)
 
     class Meta:
@@ -79,4 +81,31 @@ class Direccion(models.Model):
         verbose_name_plural = "Direcciones"
 
     def __str__(self):
-        return f"{self.etiqueta}: {self.calle_numero}, {self.ciudad}"
+        return f"{self.etiqueta} - {self.calle_numero}"
+
+    # --- AGREGA ESTA PARTE PARA SOLUCIONAR EL ERROR ---
+    @property
+    def tiene_pedidos(self):
+        """
+        Verifica si existen pedidos vinculados a esta dirección.
+        Utiliza el related_name='pedidos_realizados' que definimos en Pedido.
+        """
+        # Verificamos si existe la relación inversa. 
+        # Si la app de pedidos no está cargada o el nombre es distinto, 
+        # esto lanzará el error que ves.
+        return self.pedidos_realizados.exists()
+    
+    def save(self, *args, **kwargs):
+        # Si esta dirección se está guardando como predeterminada
+        if self.es_predeterminada:
+            # Buscamos todas las otras direcciones predeterminadas del usuario y las desactivamos
+            Direccion.objects.filter(
+                usuario=self.usuario, 
+                es_predeterminada=True
+            ).exclude(pk=self.pk).update(es_predeterminada=False)
+        
+        # Si es la única dirección que tiene el usuario, obligamos a que sea predeterminada
+        if not Direccion.objects.filter(usuario=self.usuario).exists():
+            self.es_predeterminada = True
+            
+        super().save(*args, **kwargs)

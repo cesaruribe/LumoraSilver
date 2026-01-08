@@ -1,0 +1,12 @@
+{% extends "core/menu.html" %}
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="alert alert-danger d-inline-block p-5 shadow-sm" style="border-radius: 15px;">
+        <i class="bi bi-x-circle-fill display-1 mb-4"></i>
+        <h2 class="fw-bold">Enlace no válido</h2>
+        <p class="lead">El enlace de activación ha expirado o no es válido.</p>
+        <hr>
+        <a href="{% url 'cuentas:registro' %}" class="btn btn-primary px-4">Intentar registrarme de nuevo</a>
+    </div>
+</div>
+{% endblock %}

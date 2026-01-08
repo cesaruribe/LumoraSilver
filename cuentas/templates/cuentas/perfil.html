@@ -10,18 +10,45 @@
                         <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
                     </div>
                     <h4 class="fw-bold">{{ user.get_full_name|default:user.username }}</h4>
-                    <p class="text-muted">{{ user.email }}</p>
-                    <hr>
-                    <div class="text-start mb-3">
-                        <p class="mb-1 small text-muted">Teléfono:</p>
-                        <p class="fw-bold">{{ user.telefono|default:"No registrado" }}</p>
+                    <p class="text-muted mb-1">{{ user.email }}</p>
+                    
+                    <div class="badge bg-light text-dark border mb-3">
+                        <i class="bi bi-clock-history me-1"></i> 
+                        Último ingreso: {{ user.last_login|date:"d M Y, g:i a"|default:"Primer ingreso" }}
                     </div>
-                    <a href="{% url 'cuentas:password_change' %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
-                        Cambiar Contraseña
-                    </a>
-                    <button class="btn btn-outline-danger btn-sm w-100" data-bs-toggle="modal" data-bs-target="#eliminarCuentaModal">
-                        Eliminar Cuenta
-                    </button>
+
+                    <hr>
+
+                    <div class="text-start mb-3">
+                        <h6 class="fw-bold text-uppercase small text-muted mb-3">Datos Personales</h6>
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            <div class="mb-2">
+                                <label class="small fw-bold">Nombres</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="mb-2">
+                                <label class="small fw-bold">Apellidos</label>
+                                {{ form.last_name }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="small fw-bold">Teléfono</label>
+                                {{ form.telefono }}
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm w-100 shadow-sm">
+                                <i class="bi bi-check2-circle me-1"></i> Actualizar Perfil
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="{% url 'cuentas:password_change' %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                            <i class="bi bi-key me-1"></i> Cambiar Contraseña
+                        </a>
+                        <button class="btn btn-outline-danger btn-sm w-100" data-bs-toggle="modal" data-bs-target="#eliminarCuentaModal">
+                            <i class="bi bi-trash me-1"></i> Eliminar Cuenta
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -40,7 +67,7 @@
                     <div class="col-md-6 mb-3">
                         <div class="card h-100 border-{% if dir.es_predeterminada %}primary{% else %}light{% endif %} shadow-sm">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between">
+                                <div class="d-flex justify-content-between align-items-start">
                                     <h6 class="fw-bold text-uppercase small text-muted">{{ dir.etiqueta }}</h6>
                                     {% if dir.es_predeterminada %}
                                         <span class="badge bg-primary">Predeterminada</span>
@@ -50,13 +77,63 @@
                                 <p class="mb-0 small text-muted">{{ dir.ciudad }}, {{ dir.estado_provincia }}</p>
                                 <p class="small text-muted">{{ dir.pais }} ({{ dir.codigo_postal }})</p>
                             </div>
+                            
+                            <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center pb-3">
+                                <div class="d-flex gap-2">
+                                    {% if not dir.es_predeterminada %}
+                                        <a href="{% url 'cuentas:marcar_predeterminada' dir.id %}" class="btn btn-sm btn-outline-warning" title="Marcar como predeterminada">
+                                            <i class="bi bi-star"></i>
+                                        </a>
+                                    {% endif %}
+
+                                    {% if not dir.tiene_pedidos %}
+                                        <a href="{% url 'cuentas:editar_direccion' dir.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#eliminarDireccionModal{{ dir.id }}" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        
+                                        <div class="modal fade" id="eliminarDireccionModal{{ dir.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content border-0 shadow">
+                                                    <div class="modal-header bg-danger text-white">
+                                                        <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar eliminación</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                    </div>
+                                                    <div class="modal-body text-center p-4">
+                                                        <p>¿Estás seguro de que deseas eliminar la dirección:</p>
+                                                        <h5 class="fw-bold text-dark">"{{ dir.etiqueta }}: {{ dir.calle_numero }}"</h5>
+                                                        <p class="text-muted small">Esta acción no se puede deshacer.</p>
+                                                    </div>
+                                                    <div class="modal-footer border-0 d-flex justify-content-center pb-4">
+                                                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                                                        <form method="post" action="{% url 'cuentas:eliminar_direccion' dir.id %}">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-danger px-4">Sí, eliminar</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <small class="text-muted fst-italic">
+                                            <i class="bi bi-lock-fill"></i> Inmutable
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                {% if dir.tiene_pedidos %}
+                                    <span class="badge bg-secondary-subtle text-secondary border">Fija</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="alert alert-info border-0 shadow-sm">
-                    <i class="bi bi-info-circle me-2"></i> Aún no tienes direcciones registradas. Agrega una para agilizar tus compras.
+                <div class="alert alert-info border-0 shadow-sm text-center py-4">
+                    <i class="bi bi-info-circle fs-2 d-block mb-2"></i>
+                    Aún no tienes direcciones registradas. Agrega una para agilizar tus compras.
                 </div>
             {% endif %}
         </div>

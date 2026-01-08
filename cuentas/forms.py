@@ -75,3 +75,13 @@ class DireccionForm(forms.ModelForm):
                     self.fields['municipio'].initial = muni
             except Departamento.DoesNotExist:
                 pass
+# --- FORMULARIO DE EDICIÓN DE PERFIL ---
+class EditarPerfilForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'telefono']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})

@@ -1,0 +1,1 @@
+0 3 * * * cd /ruta/a/tu/proyecto && /ruta/a/tu/entorno/bin/python manage.py limpiar_usuarios
