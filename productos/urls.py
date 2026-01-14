@@ -40,6 +40,8 @@ urlpatterns = [
     path('productos/edit/<int:id>/', views.productosEdit, name='productosedit'),
     path('productos/update/<int:id>/', views.productosUpdate, name='productosupdate'),
     path('productos/delete/<int:id>/', views.productosDestroy, name='productosdelete'),
+    # Catalogo de productos
+    path('productos/catalogo/', views.catalogo, name='catalogo'),
 ]
 
 # Solo para servir archivos multimedia durante el desarrollo

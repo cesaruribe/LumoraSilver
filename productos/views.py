@@ -4,6 +4,7 @@ from productos.models import UnidadMedida, Categoria, Producto
 from productos.forms import UnidadMedidaForm, CategoriaForm, ProductoForm
 from django.db import IntegrityError
 
+
 # Vistas para Productos
 #  *************************************************************
 #         MANEJO DE UNIDADES DE MEDIDA PARA PRODUCTOS
@@ -174,7 +175,7 @@ def productosEdit(request, id):
     form = ProductoForm(instance=producto)
     return render(request, 'productos/productosEdit.html', {
         'form': form,
-        'productos': producto
+        'producto': producto
     })
 
 def productosUpdate(request, id):
@@ -207,3 +208,21 @@ def productosDestroy(request, id):
     except IntegrityError:
         messages.warning(request, "No se puede eliminar el Producto porque está referenciada por otros registros.")
     return redirect('productos:productosshow')
+
+
+def catalogo(request):
+    # Solo mostramos productos marcados como activos
+    productos = Producto.objects.filter(activo=True)
+    categorias = Categoria.objects.all()
+    
+    # Lógica de filtrado por categoría
+    categoria_slug = request.GET.get('categoria')
+    if categoria_slug:
+        categoria = get_object_or_404(Categoria, slug=categoria_slug)
+        productos = productos.filter(categoria=categoria)
+    
+    context = {
+        'productos': productos,
+        'categorias': categorias,
+    }
+    return render(request, 'productos/catalogo.html', context)

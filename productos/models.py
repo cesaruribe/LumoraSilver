@@ -1,9 +1,7 @@
 from django.db import models
+from django.utils.text import slugify
 
-# ***************************************************************        
 # Tabla de Unidades de Medida para tamaño y grosor
-# P.E : Gramos, Kilogramos, Onzas, Centimetros, Milimetros etc.
-# ***************************************************************
 class UnidadMedida(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50)
@@ -17,16 +15,11 @@ class UnidadMedida(models.Model):
         verbose_name = 'Unidad de Medida'
         verbose_name_plural = 'Unidades de Medida'
 
-# *************************************************        
-# Tabla de Categorias a Ofrecer en el sitio web
-# P.E : Anillos, Cadenas, Aretes, etc.
-# *************************************************
+# Tabla de Categorías
 class Categoria(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=150, unique=True)
-    # Opcional: para categorías jerárquicas
-    # categoria_padre = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    slug = models.SlugField(max_length=150, unique=True) # URLs amigables
 
     def __str__(self):
         return self.nombre
@@ -36,16 +29,19 @@ class Categoria(models.Model):
         verbose_name = 'Categoría'
         verbose_name_plural = 'Categorías'
 
-# *************************************************        
-# Tabla de Productos a Ofrecer en el sitio web
-# *************************************************
+# Tabla de Productos
 class Producto(models.Model):
     id = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=10, unique=True)   
-    nombre = models.CharField(max_length=200)
+    nombre = models.CharField(max_length=40)
+    slug = models.SlugField(max_length=250, unique=True, blank=True) # SEO
     descripcion = models.TextField()
     
-    # Tamaño y grosor como opcionales (no todos los productos los necesitan)
+    # Precios y Ofertas
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_oferta = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
+    # Medidas (opcionales)
     tamano = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
     unidad_tamano = models.ForeignKey(
         UnidadMedida, 
@@ -64,13 +60,22 @@ class Producto(models.Model):
         related_name='productos_grosor'
     )
     
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
     imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
     stock = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
+
+    @property
+    def precio_final(self):
+        """Retorna el precio de oferta si existe, de lo contrario el normal."""
+        return self.precio_oferta if self.precio_oferta else self.precio
 
     def __str__(self):
         return self.nombre
@@ -79,5 +84,4 @@ class Producto(models.Model):
         db_table = 'producto'
         verbose_name = 'Producto'
         verbose_name_plural = 'Productos'
-        # Para evitar productos duplicados
         unique_together = ['nombre', 'categoria', 'codigo']
