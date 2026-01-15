@@ -5,13 +5,15 @@ from productos.forms import UnidadMedidaForm, CategoriaForm, ProductoForm
 from django.db import IntegrityError
 from django.db.models import Q 
 from django.core.paginator import Paginator 
-
+# Importamos el decorador para restringir el acceso
+from django.contrib.auth.decorators import login_required
 
 # Vistas para Productos
 #  *************************************************************
 #         MANEJO DE UNIDADES DE MEDIDA PARA PRODUCTOS
-#   SE USA EL SISTEMA DE MESAJE DE DJANGO PARA NOTIFICACIONES 
 #  *************************************************************
+
+@login_required
 def unidadesNew(request):
     if request.method == "POST":
         form = UnidadMedidaForm(request.POST)
@@ -27,225 +29,139 @@ def unidadesNew(request):
     else:
         form = UnidadMedidaForm()
     
-    return render(request, 'productos/unidadesNew.html', {
-        'form': form
-    })
+    return render(request, 'productos/unidadesNew.html', {'form': form})
 
+@login_required
 def unidadesShow(request):
     unidades = UnidadMedida.objects.all()
-    return render(request, 'productos/unidadesShow.html', {
-        'unidades': unidades
-    })
+    return render(request, 'productos/unidadesShow.html', {'unidades': unidades})
 
+@login_required
 def unidadesEdit(request, id):
-    unidad = get_object_or_404(UnidadMedida, pk=id)
+    unidad = get_object_or_404(UnidadMedida, id=id)
     form = UnidadMedidaForm(instance=unidad)
-    return render(request, 'productos/unidadesEdit.html', {
-        'form': form,
-        'unidades': unidad
-    })
+    return render(request, 'productos/unidadesEdit.html', {'form': form, 'unidad': unidad})
 
+@login_required
 def unidadesUpdate(request, id):
-    unidad = get_object_or_404(UnidadMedida, pk=id)
-    if request.method == "POST":
-        form = UnidadMedidaForm(request.POST, instance=unidad)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Unidad actualizada correctamente.")
-            return redirect('productos:unidadesshow')
-        else:
-            messages.warning(request, "Por favor corrige los errores del formulario.")
-            return render(request, 'productos/unidadesEdit.html', {
-                'form': form,
-                'unidades': unidad
-            })
-    else:
-        form = UnidadMedidaForm(instance=unidad)
+    unidad = get_object_or_404(UnidadMedida, id=id)
+    form = UnidadMedidaForm(request.POST, instance=unidad)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Unidad actualizada correctamente.")
+        return redirect('productos:unidadesshow')
+    return render(request, 'productos/unidadesEdit.html', {'form': form, 'unidad': unidad})
 
-    return render(request, 'productos/unidadesEdit.html', {
-        'form': form,
-        'unidades': unidad
-    })
-
+@login_required
 def unidadesDestroy(request, id):
-    unidad = get_object_or_404(UnidadMedida, pk=id)
+    unidad = get_object_or_404(UnidadMedida, id=id)
     try:
         unidad.delete()
         messages.success(request, "Unidad eliminada correctamente.")
     except IntegrityError:
-        messages.warning(request, "No se puede eliminar la unidad porque está referenciada por otros registros.")
+        messages.error(request, "No se puede eliminar la unidad porque está siendo usada por productos.")
     return redirect('productos:unidadesshow')
 
+
 #  *************************************************************
-#         MANEJO DE CATEGORIAS DE LOS PRODUCTOS
-#   SE USA EL SISTEMA DE MESAJE DE DJANGO PARA NOTIFICACIONES 
+#         MANEJO DE CATEGORIAS
 #  *************************************************************
+
+@login_required
 def categoriasNew(request):
     if request.method == "POST":
         form = CategoriaForm(request.POST)
         if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, "Categoria creada exitosamente.")
-                return redirect('productos:categoriasshow')
-            except Exception as e:
-                messages.error(request, f"Error al guardar la Categoria: {e}")
-        else:
-            messages.warning(request, "Por favor corrige los errores del formulario.")
+            form.save()
+            messages.success(request, "Categoría creada.")
+            return redirect('productos:categoriasshow')
     else:
         form = CategoriaForm()
-    
-    return render(request, 'productos/categoriasNew.html', {
-        'form': form
-    })
+    return render(request, 'productos/categoriasNew.html', {'form': form})
 
+@login_required
 def categoriasShow(request):
-    categoria = Categoria.objects.all()
-    return render(request, 'productos/categoriasShow.html', {
-        'categorias': categoria
-    })
+    categorias = Categoria.objects.all()
+    return render(request, 'productos/categoriasShow.html', {'categorias': categorias})
 
+@login_required
 def categoriasEdit(request, id):
-    categoria = get_object_or_404(Categoria, pk=id)
+    categoria = get_object_or_404(Categoria, id=id)
     form = CategoriaForm(instance=categoria)
-    return render(request, 'productos/categoriasEdit.html', {
-        'form': form,
-        'categorias': categoria
-    })
+    return render(request, 'productos/categoriasEdit.html', {'form': form, 'categoria': categoria})
 
+@login_required
 def categoriasUpdate(request, id):
-    categoria = get_object_or_404(Categoria, pk=id)
-    if request.method == "POST":
-        form = CategoriaForm(request.POST, instance=categoria)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "categoria actualizada correctamente.")
-            return redirect('productos:categoriasshow')
-        else:
-            messages.warning(request, "Por favor corrige los errores del formulario.")
-            return render(request, 'productos/categoriasEdit.html', {
-                'form': form,
-                'categorias': categoria
-            })
-    else:
-        form = CategoriaForm(instance=categoria)
+    categoria = get_object_or_404(Categoria, id=id)
+    form = CategoriaForm(request.POST, instance=categoria)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Categoría actualizada.")
+        return redirect('productos:categoriasshow')
+    return render(request, 'productos/categoriasEdit.html', {'form': form, 'categoria': categoria})
 
-    return render(request, 'productos/categoriasEdit.html', {
-        'form': form,
-        'categorias': categoria
-    })
-
+@login_required
 def categoriasDestroy(request, id):
-    categoria = get_object_or_404(Categoria, pk=id)
+    categoria = get_object_or_404(Categoria, id=id)
     try:
         categoria.delete()
-        messages.success(request, "Categoria eliminada correctamente.")
+        messages.success(request, "Categoría eliminada.")
     except IntegrityError:
-        messages.warning(request, "No se puede eliminar la categoria porque está referenciada por otros registros.")
+        messages.error(request, "No se puede eliminar la categoría porque tiene productos asociados.")
     return redirect('productos:categoriasshow')
+
+
 #  *************************************************************
-#         MANEJO DE PRODUCTOS
-#   SE USA EL SISTEMA DE MESAJE DE DJANGO PARA NOTIFICACIONES 
+#         MANEJO DE PRODUCTOS (ADMINISTRACIÓN)
 #  *************************************************************
+
+@login_required
 def productosNew(request):
     if request.method == "POST":
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, "Producto creado exitosamente.")
-                return redirect('productos:productosshow')
-            except Exception as e:
-                messages.error(request, f"Error al guardar el Producto: {e}")
-        else:
-            messages.warning(request, "Por favor corrige los errores del formulario.")
+            form.save()
+            messages.success(request, "Producto creado.")
+            return redirect('productos:productosshow')
     else:
         form = ProductoForm()
-    
-    return render(request, 'productos/productosNew.html', {
-        'form': form
-    })
+    return render(request, 'productos/productosNew.html', {'form': form})
 
-
+@login_required
 def productosShow(request):
-    query = request.GET.get('q', '')
-    categoria_id = request.GET.get('categoria', '')
-    oferta = request.GET.get('oferta', '') # Nuevo parámetro
+    productos = Producto.objects.all()
+    return render(request, 'productos/productosShow.html', {'productos': productos})
 
-    productos_list = Producto.objects.all().order_by('-id')
-
-    # Filtro por texto
-    if query:
-        productos_list = productos_list.filter(
-            Q(nombre__icontains=query) | Q(codigo__icontains=query)
-        )
-    
-    # Filtro por categoría
-    if categoria_id:
-        productos_list = productos_list.filter(categoria_id=categoria_id)
-
-    # Lógica de UX: Filtro por Oferta
-    if oferta == 'si':
-        productos_list = productos_list.filter(precio_oferta__isnull=False)
-    elif oferta == 'no':
-        productos_list = productos_list.filter(precio_oferta__isnull=True)
-
-    # Paginación
-    paginator = Paginator(productos_list, 10)
-    page_number = request.GET.get('page')
-    productos = paginator.get_page(page_number)
-
-    categorias = Categoria.objects.all()
-
-    return render(request, 'productos/productosShow.html', {
-        'productos': productos,
-        'categorias': categorias,
-        'query': query,
-        'categoria_id': categoria_id,
-        'oferta': oferta # Lo pasamos para mantener el estado en el HTML
-    })
-
+@login_required
 def productosEdit(request, id):
-    producto = get_object_or_404(Producto, pk=id)
+    producto = get_object_or_404(Producto, id=id)
     form = ProductoForm(instance=producto)
-    return render(request, 'productos/productosEdit.html', {
-        'form': form,
-        'producto': producto
-    })
+    return render(request, 'productos/productosEdit.html', {'form': form, 'producto': producto})
 
+@login_required
 def productosUpdate(request, id):
-    producto = get_object_or_404(Producto, pk=id)
-    if request.method == "POST":
-        form = ProductoForm(request.POST, request.FILES, instance=producto)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Producto actualizado correctamente.")
-            return redirect('productos:productosshow')
-        else:
-            messages.warning(request, "Por favor corrige los errores del formulario.")
-            return render(request, 'productos/productosEdit.html', {
-                'form': form,
-                'producto': producto
-            })
-    else:
-        form = ProductoForm(instance=producto)
+    producto = get_object_or_404(Producto, id=id)
+    form = ProductoForm(request.POST, request.FILES, instance=producto)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Producto actualizado.")
+        return redirect('productos:productosshow')
+    return render(request, 'productos/productosEdit.html', {'form': form, 'producto': producto})
 
-    return render(request, 'productos/productosEdit.html', {
-        'form': form,
-        'producto': producto
-    })
-
+@login_required
 def productosDestroy(request, id):
-    producto = get_object_or_404(Producto, pk=id)
-    try:
-        producto.delete()
-        messages.success(request, "Producto eliminado correctamente.")
-    except IntegrityError:
-        messages.warning(request, "No se puede eliminar el Producto porque está referenciada por otros registros.")
+    producto = get_object_or_404(Producto, id=id)
+    producto.delete()
+    messages.success(request, "Producto eliminado.")
     return redirect('productos:productosshow')
 
+
+#  *************************************************************
+#         VISTAS PÚBLICAS (CATÁLOGO Y DETALLE)
+#  *************************************************************
+
 def catalogo(request):
-    # Filtramos solo activos y optimizamos la consulta
+    # Optimizamos la consulta
     productos = Producto.objects.select_related('categoria').filter(activo=True).order_by('-fecha_creacion')
     categorias = Categoria.objects.all()
 
@@ -273,4 +189,18 @@ def catalogo(request):
         'query': query,
         'min_p': min_p,
         'max_p': max_p
+    })
+
+def productoDetalle(request, id):
+    producto = get_object_or_404(Producto, id=id, activo=True)
+    
+    # Calculamos el porcentaje de ahorro
+    ahorro_porcentaje = 0
+    if producto.precio_oferta and producto.precio > 0:
+        descuento = producto.precio - producto.precio_oferta
+        ahorro_porcentaje = (descuento / producto.precio) * 100
+
+    return render(request, 'productos/productoDetalle.html', {
+        'producto': producto,
+        'ahorro_porcentaje': ahorro_porcentaje
     })
