@@ -1,77 +1,164 @@
 {% extends "core/menu.html" %}
+{% load humanize %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-5">
     <div class="row">
         <aside class="col-lg-3 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="fw-bold mb-3">Categorías</h5>
-                    <div class="list-group list-group-flush">
-                        <a href="{% url 'productos:catalogo' %}" class="list-group-item list-group-item-action border-0 px-0">
-                            Todas las joyas
-                        </a>
-                        {% for cat in categorias %}
-                        <a href="?categoria={{ cat.slug }}" class="list-group-item list-group-item-action border-0 px-0">
-                            {{ cat.nombre }}
-                        </a>
-                        {% endfor %}
-                    </div>
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-body p-4">
+                    <form method="GET" action="{% url 'productos:catalogo' %}">
+                        
+                        <h6 class="fw-bold mb-3">¿Qué joya buscas?</h6>
+                        <div class="input-group mb-4 shadow-sm rounded">
+                            <input type="text" 
+                                   name="q" 
+                                   class="form-control border-secondary-subtle py-2 ps-3" 
+                                   placeholder="Ej: Anillo..." 
+                                   value="{{ query|default:'' }}"
+                                   style="border-right: none;">
+                            <button class="btn btn-outline-secondary border-secondary-subtle bg-white px-3" 
+                                    type="submit"
+                                    style="border-left: none;">
+                                <i class="fas fa-search text-primary"></i>
+                            </button>
+                        </div>
+
+                        <h6 class="fw-bold mb-3">Categorías</h6>
+                        <div class="list-group list-group-flush mb-4">
+                            <a href="{% url 'productos:catalogo' %}" 
+                               class="list-group-item list-group-item-action border-0 px-0 {% if not request.GET.categoria %}text-primary fw-bold{% endif %}">
+                                <i class="fas fa-chevron-right me-2 small"></i>Todas las joyas
+                            </a>
+                            {% for cat in categorias %}
+                            <a href="?categoria={{ cat.slug }}{% if query %}&q={{ query }}{% endif %}" 
+                               class="list-group-item list-group-item-action border-0 px-0 {% if request.GET.categoria == cat.slug %}text-primary fw-bold{% endif %}">
+                                <i class="fas fa-chevron-right me-2 small"></i>{{ cat.nombre }}
+                            </a>
+                            {% endfor %}
+                        </div>
+
+                        <h6 class="fw-bold mb-3">Rango de Precio</h6>
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <input type="number" name="min_p" class="form-control form-control-sm border-secondary-subtle" placeholder="Mín" value="{{ min_p }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" name="max_p" class="form-control form-control-sm border-secondary-subtle" placeholder="Máx" value="{{ max_p }}">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold rounded-pill mb-2 shadow-sm">
+                            APLICAR FILTROS
+                        </button>
+                        {% if query or request.GET.categoria or min_p or max_p %}
+                            <a href="{% url 'productos:catalogo' %}" class="btn btn-link w-100 text-muted small text-decoration-none">
+                                <i class=\"fas fa-times me-1\"></i>Limpiar filtros
+                            </a>
+                        {% endif %}
+                    </form>
                 </div>
             </div>
         </aside>
 
         <main class="col-lg-9">
-            <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 ps-2">
+                <h4 class="fw-bold mb-0 text-dark">
+                    {% if request.GET.categoria %}Joyas en {{ request.GET.categoria|title }}{% else %}Nuestra Colección{% endif %}
+                </h4>
+                <small class="text-muted fw-semibold">{{ productos.count }} piezas encontradas</small>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                 {% for producto in productos %}
                 <div class="col">
-                    <div class="card h-100 border-0 shadow-sm position-relative overflow-hidden">
-                        {% if producto.precio_oferta %}
-                        <span class="position-absolute top-0 start-0 badge bg-danger m-2">Oferta</span>
-                        {% endif %}
+                    <div class="card h-100 border-0 shadow-sm position-relative overflow-hidden transition-card">
                         
-                        {% if producto.imagen %}
-                            <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 250px; object-fit: cover;">
-                        {% else %}
-                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
-                                <i class="bi bi-image text-muted fs-1"></i>
-                            </div>
-                        {% endif %}
+                        <div class="position-absolute top-0 end-0 p-2" style="z-index: 10;">
+                            {% if producto.precio_oferta %}
+                                <span class="badge bg-danger shadow-sm px-3 py-2 rounded-pill mb-1 d-block">¡OFERTA!</span>
+                            {% endif %}
+                            {% if producto.stock > 0 and producto.stock <= 5 %}
+                                <span class="badge bg-warning text-dark shadow-sm px-3 py-2 rounded-pill d-block">
+                                    <i class="fas fa-fire me-1"></i>Últimas {{ producto.stock }}
+                                </span>
+                            {% endif %}
+                        </div>
 
-                        <div class="card-body text-center">
-                            <h6 class="text-muted small mb-1">{{ producto.categoria.nombre }}</h6>
-                            <h5 class="card-title fw-bold mb-2">{{ producto.nombre }}</h5>
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 260px;">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" class="card-img-top w-100 h-100" alt="{{ producto.nombre }}" style="object-fit: cover;">
+                            {% else %}
+                                <i class="bi bi-image text-muted display-4"></i>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body p-4 d-flex flex-column">
+                            <span class="text-primary small fw-bold text-uppercase mb-1">{{ producto.categoria.nombre }}</span>
+                            <h5 class="card-title fw-bold text-dark mb-2 text-break">{{ producto.nombre }}</h5>
                             
-                            <div class="mb-3">
+                            <p class="card-text text-muted small mb-3 flex-grow-1">
+                                {{ producto.descripcion|truncatechars:90|default:"Pieza de joyería exclusiva diseñada con los más altos estándares de calidad." }}
+                            </p>
+                            
+                            <div class="mb-4">
                                 {% if producto.precio_oferta %}
-                                    <span class="text-danger fw-bold fs-5">${{ producto.precio_oferta }}</span>
-                                    <span class="text-muted text-decoration-line-through small ms-2">${{ producto.precio }}</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-danger fw-bold h4 mb-0">${{ producto.precio_oferta|floatformat:2|intcomma }}</span>
+                                        <span class="text-muted text-decoration-line-through small">${{ producto.precio|floatformat:2|intcomma }}</span>
+                                    </div>
                                 {% else %}
-                                    <span class="fw-bold fs-5 text-dark">${{ producto.precio }}</span>
+                                    <span class="fw-bold h4 text-dark mb-0">${{ producto.precio|floatformat:2|intcomma }}</span>
                                 {% endif %}
                             </div>
 
                             {% if producto.stock > 0 %}
                                 <form method="post" action="#"> {% csrf_token %}
                                     <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                                    <button type="submit" class="btn btn-warning w-100 rounded-pill fw-bold">
-                                        <i class="bi bi-bag-plus me-1"></i> Añadir
+                                    <button type="submit" class="btn btn-dark w-100 py-2 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-cart-plus fs-5"></i> AÑADIR AL CARRITO
                                     </button>
                                 </form>
                             {% else %}
-                                <button class="btn btn-secondary w-100 rounded-pill disabled">Agotado</button>
+                                <button class="btn btn-outline-secondary w-100 py-2 rounded-pill disabled fw-bold border-2">
+                                    AGOTADO TEMPORALMENTE
+                                </button>
                             {% endif %}
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12 text-center py-5">
-                    <i class="bi bi-search fs-1 text-muted"></i>
-                    <p class="mt-3">No encontramos productos en esta categoría.</p>
+                    <div class="p-5 bg-white shadow-sm rounded-4 border">
+                        <i class="fas fa-search-minus display-2 text-muted opacity-25 mb-4"></i>
+                        <h4 class="fw-bold">No encontramos lo que buscas</h4>
+                        <p class="text-muted">Intenta ajustando los filtros de precio o buscando un término más general.</p>
+                        <a href="{% url 'productos:catalogo' %}" class="btn btn-primary px-4 rounded-pill fw-bold mt-2">
+                            Ver todo el catálogo
+                        </a>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </main>
     </div>
 </div>
+
+<style>
+    /* Efecto de elevación suave al pasar el mouse (UX) */
+    .transition-card { 
+        transition: transform 0.3s ease, box-shadow 0.3s ease; 
+    }
+    .transition-card:hover { 
+        transform: translateY(-10px); 
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.12)!important; 
+    }
+    /* Estilo para el scroll de descripciones largas si fuera necesario */
+    .card-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
 {% endblock %}

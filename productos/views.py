@@ -3,6 +3,8 @@ from django.contrib import messages
 from productos.models import UnidadMedida, Categoria, Producto
 from productos.forms import UnidadMedidaForm, CategoriaForm, ProductoForm
 from django.db import IntegrityError
+from django.db.models import Q 
+from django.core.paginator import Paginator 
 
 
 # Vistas para Productos
@@ -164,10 +166,43 @@ def productosNew(request):
         'form': form
     })
 
+
 def productosShow(request):
-    producto = Producto.objects.all()
+    query = request.GET.get('q', '')
+    categoria_id = request.GET.get('categoria', '')
+    oferta = request.GET.get('oferta', '') # Nuevo parámetro
+
+    productos_list = Producto.objects.all().order_by('-id')
+
+    # Filtro por texto
+    if query:
+        productos_list = productos_list.filter(
+            Q(nombre__icontains=query) | Q(codigo__icontains=query)
+        )
+    
+    # Filtro por categoría
+    if categoria_id:
+        productos_list = productos_list.filter(categoria_id=categoria_id)
+
+    # Lógica de UX: Filtro por Oferta
+    if oferta == 'si':
+        productos_list = productos_list.filter(precio_oferta__isnull=False)
+    elif oferta == 'no':
+        productos_list = productos_list.filter(precio_oferta__isnull=True)
+
+    # Paginación
+    paginator = Paginator(productos_list, 10)
+    page_number = request.GET.get('page')
+    productos = paginator.get_page(page_number)
+
+    categorias = Categoria.objects.all()
+
     return render(request, 'productos/productosShow.html', {
-        'productos': producto
+        'productos': productos,
+        'categorias': categorias,
+        'query': query,
+        'categoria_id': categoria_id,
+        'oferta': oferta # Lo pasamos para mantener el estado en el HTML
     })
 
 def productosEdit(request, id):
@@ -209,20 +244,33 @@ def productosDestroy(request, id):
         messages.warning(request, "No se puede eliminar el Producto porque está referenciada por otros registros.")
     return redirect('productos:productosshow')
 
-
 def catalogo(request):
-    # Solo mostramos productos marcados como activos
-    productos = Producto.objects.filter(activo=True)
+    # Filtramos solo activos y optimizamos la consulta
+    productos = Producto.objects.select_related('categoria').filter(activo=True).order_by('-fecha_creacion')
     categorias = Categoria.objects.all()
-    
-    # Lógica de filtrado por categoría
+
+    # Captura de filtros desde el GET
+    query = request.GET.get('q')
+    min_p = request.GET.get('min_p')
+    max_p = request.GET.get('max_p')
     categoria_slug = request.GET.get('categoria')
-    if categoria_slug:
-        categoria = get_object_or_404(Categoria, slug=categoria_slug)
-        productos = productos.filter(categoria=categoria)
+
+    if query:
+        productos = productos.filter(nombre__icontains=query)
     
-    context = {
+    if categoria_slug:
+        productos = productos.filter(categoria__slug=categoria_slug)
+
+    if min_p:
+        productos = productos.filter(precio__gte=min_p)
+        
+    if max_p:
+        productos = productos.filter(precio__lte=max_p)
+
+    return render(request, 'productos/catalogo.html', {
         'productos': productos,
         'categorias': categorias,
-    }
-    return render(request, 'productos/catalogo.html', context)
+        'query': query,
+        'min_p': min_p,
+        'max_p': max_p
+    })

@@ -5,12 +5,67 @@
 {% block content %}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 text-dark fw-bold">
-            <i class="fas fa-boxes me-2 text-primary"></i> Control de Inventario
-        </h2>
-        <a href="{% url 'productos:productosnew' %}" class="btn btn-primary shadow-sm fw-bold">
+        <div>
+            <h2 class="mb-0 text-dark fw-bold">
+                <i class="fas fa-boxes me-2 text-primary"></i> Control de Inventario
+            </h2>
+            <p class="text-muted small mb-0">Gestiona tus productos, precios y existencias.</p>
+        </div>
+        <a href="{% url 'productos:productosnew' %}" class="btn btn-primary shadow-sm fw-bold px-4">
             <i class="fas fa-plus me-1"></i> Nuevo Producto
         </a>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4 bg-light">
+        <div class="card-body">
+            <form method="GET" action="{% url 'productos:productosshow' %}" class="row g-2">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0" 
+                               placeholder="Nombre o código..." value="{{ query|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="categoria" class="form-select">
+                        <option value="">Todas las categorías</option>
+                        {% for cat in categorias %}
+                            <option value="{{ cat.id }}" {% if categoria_id == cat.id|stringformat:"i" %}selected{% endif %}>
+                                {{ cat.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="oferta" class="form-select border-primary-subtle">
+                        <option value="" {% if oferta == "" %}selected{% endif %}>Todos los precios</option>
+                        <option value="si" {% if oferta == "si" %}selected{% endif %}>🔥 Solo en Oferta</option>
+                        <option value="no" {% if oferta == "no" %}selected{% endif %}>Precio Regular</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">
+                        Filtrar
+                    </button>
+                    {% if query or categoria_id or oferta %}
+                    <a href="{% url 'productos:productosshow' %}" class="btn btn-outline-secondary" title="Limpiar filtros">
+                        <i class="fas fa-undo"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="mb-3 ps-1">
+        <small class="text-muted">
+            Se encontraron <strong>{{ productos.paginator.count }}</strong> productos
+        </small>
     </div>
 
     <div class="card shadow-sm border-0">
@@ -20,7 +75,8 @@
                     <thead class="bg-light text-muted small text-uppercase border-bottom">
                         <tr>
                             <th class="px-4 py-3 text-center">Imagen</th>
-                            <th>Info. Producto</th>
+                            <th>Código</th>
+                            <th>Nombre del Producto</th>
                             <th>Categoría</th>
                             <th class="text-end">Precio</th>
                             <th class="text-center">Stock</th>
@@ -32,23 +88,23 @@
                         <tr>
                             <td class="px-4 text-center">
                                 {% if producto.imagen %}
-                                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="rounded border shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="rounded border shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
                                 {% else %}
-                                    <div class="rounded bg-light d-flex align-items-center justify-content-center border mx-auto" style="width: 50px; height: 50px;">
+                                    <div class="rounded bg-light d-flex align-items-center justify-content-center border mx-auto" style="width: 45px; height: 45px;">
                                         <i class="bi bi-image text-muted"></i>
                                     </div>
                                 {% endif %}
                             </td>
-
+                            <td><span class="badge bg-secondary opacity-75 fw-normal">{{ producto.codigo }}</span></td>
                             <td>
-                                <div class="fw-bold text-dark text-break">{{ producto.nombre }}</div>
-                                <div class="text-muted small">{{ producto.codigo }}</div>
+                                <div class="d-flex align-items-center">
+                                    <div class="fw-bold text-dark text-break">{{ producto.nombre }}</div>
+                                    {% if producto.precio_oferta %}
+                                        <span class="badge rounded-pill bg-danger ms-2 small" style="font-size: 0.65rem;">OFERTA</span>
+                                    {% endif %}
+                                </div>
                             </td>
-
-                            <td>
-                                <span class="badge bg-light text-dark border">{{ producto.categoria.nombre }}</span>
-                            </td>
-
+                            <td><span class="badge bg-light text-dark border">{{ producto.categoria.nombre }}</span></td>
                             <td class="text-end">
                                 {% if producto.precio_oferta %}
                                     <div class="text-danger fw-bold">${{ producto.precio_oferta|floatformat:2|intcomma }}</div>
@@ -57,130 +113,96 @@
                                     <div class="fw-bold text-dark">${{ producto.precio|floatformat:2|intcomma }}</div>
                                 {% endif %}
                             </td>
-
                             <td class="text-center">
-                                {% if producto.stock <= 5 %}
-                                    <span class="badge bg-danger px-2 py-1">{{ producto.stock }}</span>
-                                {% else %}
-                                    <span class="badge bg-success opacity-75 px-2 py-1">{{ producto.stock }}</span>
-                                {% endif %}
+                                <span class="badge {% if producto.stock <= 5 %}bg-danger{% else %}bg-success opacity-75{% endif %} px-2 py-1">
+                                    {{ producto.stock }} unid.
+                                </span>
                             </td>
-
                             <td class="text-center px-4 text-nowrap">
-                                <button type="button" class="btn btn-outline-info btn-sm me-1" data-bs-toggle="modal" data-bs-target="#viewModal{{ producto.id }}" title="Vista Rápida">
+                                <button type="button" class="btn btn-outline-info btn-sm me-1" data-bs-toggle="modal" data-bs-target="#viewModal{{ producto.id }}">
                                     <i class="fas fa-eye"></i>
                                 </button>
-
-                                <a href="{% url 'productos:productosedit' producto.id %}" class="btn btn-outline-primary btn-sm me-1" title="Editar">
-                                    <i class="fas fa-pen-to-square"></i>
+                                <a href="{% url 'productos:productosedit' producto.id %}" class="btn btn-outline-primary btn-sm me-1">
+                                    <i class="fas fa-pen"></i>
                                 </a>
-                                
-                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ producto.id }}" title="Eliminar">
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ producto.id }}">
                                     <i class="fas fa-trash-can"></i>
                                 </button>
 
                                 <div class="modal fade" id="viewModal{{ producto.id }}" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog modal-lg modal-dialog-centered">
-                                        <div class="modal-content border-0 shadow-lg">
-                                            <div class="modal-header border-0 bg-light position-relative">
-                                                <h5 class="modal-title fw-bold text-break pe-5">Detalles: {{ producto.nombre }}</h5>
-                                                <button type="button" class="btn-close position-absolute top-50 end-0 translate-middle-y me-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                        <div class="modal-content border-0 shadow-lg text-start">
+                                            <div class="modal-header border-0 bg-light">
+                                                <h5 class="modal-title fw-bold">Detalles del Producto</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body p-4">
                                                 <div class="row">
-                                                    <div class="col-md-5 mb-4 mb-md-0 text-center">
+                                                    <div class="col-md-5 text-center mb-3 mb-md-0">
                                                         {% if producto.imagen %}
-                                                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="img-fluid rounded shadow-sm border w-100" style="max-height: 350px; object-fit: contain;">
+                                                            <img src="{{ producto.imagen.url }}" class="img-fluid rounded border shadow-sm w-100" style="max-height: 300px; object-fit: contain;">
                                                         {% else %}
-                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center border h-100" style="min-height: 250px;">
+                                                            <div class="bg-light rounded d-flex align-items-center justify-content-center border h-100" style="min-height: 200px;">
                                                                 <i class="bi bi-image text-muted fs-1"></i>
                                                             </div>
                                                         {% endif %}
                                                     </div>
-
-                                                    <div class="col-md-7 text-start">
-                                                        <span class="badge bg-primary mb-2 text-uppercase">{{ producto.categoria.nombre }}</span>
-                                                        
-                                                        <h3 class="fw-bold text-dark mb-1 text-break">{{ producto.nombre }}</h3>
-                                                        <p class="text-muted small mb-3">Código Único: <span class="fw-bold">{{ producto.codigo }}</span></p>
+                                                    <div class="col-md-7">
+                                                        <span class="badge bg-primary mb-2">{{ producto.categoria.nombre }}</span>
+                                                        <h3 class="fw-bold text-dark text-break mb-1">{{ producto.nombre }}</h3>
+                                                        <p class="text-muted small mb-3">Código: <strong>{{ producto.codigo }}</strong></p>
                                                         
                                                         <div class="mb-3">
-                                                            <label class="text-muted small d-block fw-bold text-uppercase">Descripción:</label>
-                                                            <div class="text-dark p-2 border rounded bg-light" style="max-height: 150px; overflow-y: auto;">
-                                                                <p class="mb-0 text-break" style="white-space: pre-line;">
-                                                                    {{ producto.descripcion|default:"Este producto no tiene una descripción detallada." }}
+                                                            <label class="text-muted small fw-bold text-uppercase d-block mb-1">Descripción:</label>
+                                                            <div class="p-2 border rounded bg-light" style="max-height: 100px; overflow-y: auto;">
+                                                                <p class="small mb-0 text-dark italic">
+                                                                    {{ producto.descripcion|default:"Sin descripción detallada." }}
                                                                 </p>
                                                             </div>
                                                         </div>
 
-                                                        <div class="row g-2 mb-4">
-                                                            <div class="col-6">
-                                                                <div class="p-2 border rounded bg-light shadow-sm">
-                                                                    <small class="text-muted d-block fw-bold">Precio Base:</small>
-                                                                    <span class="fw-bold h5 mb-0 {% if producto.precio_oferta %}text-decoration-line-through text-muted{% else %}text-dark{% endif %}">${{ producto.precio|floatformat:2|intcomma }}</span>
-                                                                </div>
-                                                            </div>
-                                                            {% if producto.precio_oferta %}
-                                                            <div class="col-6">
-                                                                <div class="p-2 border border-danger rounded bg-danger-subtle shadow-sm text-center">
-                                                                    <small class="text-danger fw-bold d-block">¡En Oferta!</small>
-                                                                    <span class="fw-bold h5 mb-0 text-danger">${{ producto.precio_oferta|floatformat:2|intcomma }}</span>
-                                                                </div>
-                                                            </div>
-                                                            {% endif %}
-                                                        </div>
-
-                                                        <div class="row text-center border-top pt-3">
-                                                            <div class="col-4 border-end">
-                                                                <small class="text-muted d-block">Tamaño</small>
-                                                                <span class="fw-bold">{{ producto.tamano|default:"-" }} {{ producto.unidad_tamano.simbolo }}</span>
-                                                            </div>
-                                                            <div class="col-4 border-end">
-                                                                <small class="text-muted d-block">Grosor</small>
-                                                                <span class="fw-bold">{{ producto.grosor|default:"-" }} {{ producto.unidad_grosor.simbolo }}</span>
-                                                            </div>
-                                                            <div class="col-4">
-                                                                <small class="text-muted d-block">Existencia</small>
-                                                                <span class="fw-bold text-success">{{ producto.stock }} unid.</span>
+                                                        <div class="p-3 border rounded mb-3 {% if producto.precio_oferta %}border-danger bg-danger-subtle{% else %}bg-light{% endif %} shadow-sm text-center">
+                                                            <div class="row">
+                                                                {% if producto.precio_oferta %}
+                                                                    <div class="col border-end border-danger-subtle">
+                                                                        <small class="text-muted d-block fw-bold">BASE</small>
+                                                                        <span class="text-muted text-decoration-line-through h6">${{ producto.precio|floatformat:2|intcomma }}</span>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <small class="text-danger d-block fw-bold">OFERTA</small>
+                                                                        <span class="text-danger fw-bold h4">${{ producto.precio_oferta|floatformat:2|intcomma }}</span>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="col">
+                                                                        <small class="text-muted d-block fw-bold">PRECIO</small>
+                                                                        <span class="fw-bold h4 text-dark">${{ producto.precio|floatformat:2|intcomma }}</span>
+                                                                    </div>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
+                                                        <p class="small text-muted mb-0"><strong>Stock:</strong> {{ producto.stock }} unidades.</p>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="modal-footer bg-light border-0">
-                                                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cerrar Vista</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="modal fade" id="deleteModal{{ producto.id }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-dialog modal-dialog-centered text-start">
                                         <div class="modal-content border-0 shadow">
                                             <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title fw-bold">
-                                                    <i class="fas fa-trash-can me-2"></i> Confirmar Borrado
-                                                </h5>
+                                                <h5 class="modal-title fw-bold">Confirmar Borrado</h5>
                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                             </div>
-                                            
                                             <div class="modal-body text-center p-4">
-                                                <p class="mb-2 text-muted">¿Estás seguro de que deseas eliminar permanentemente:</p>
-                                                
-                                                <h5 class="fw-bold text-dark text-break px-3 mb-3">
-                                                    "{{ producto.nombre }}"
-                                                </h5>
-                                                
-                                                <div class="border-top pt-2">
-                                                    <p class="text-danger small mb-0">
-                                                        <i class="fas fa-exclamation-triangle me-1"></i>
-                                                        Esta acción no se puede deshacer.
-                                                    </p>
-                                                </div>
+                                                <p class="mb-2 text-muted small text-uppercase fw-bold">¿Deseas eliminar permanentemente?</p>
+                                                <h5 class="fw-bold text-dark text-break px-3 mb-3">"{{ producto.nombre }}"</h5>
+                                                <p class="text-danger small mb-0"><i class="fas fa-exclamation-triangle me-1"></i> Esta acción no se puede deshacer.</p>
                                             </div>
-
                                             <div class="modal-footer bg-light border-0 justify-content-center">
                                                 <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                                                <a href="{% url 'productos:productosdelete' producto.id %}" class="btn btn-danger px-4 fw-bold shadow-sm">Sí, Eliminar</a>
+                                                <a href="{% url 'productos:productosdelete' producto.id %}" class="btn btn-danger px-4 fw-bold">Sí, Eliminar</a>
                                             </div>
                                         </div>
                                     </div>
@@ -188,19 +210,34 @@
                             </td>
                         </tr>
                         {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="fas fa-box-open fs-1 mb-3"></i>
-                                    <p class="h5">No hay productos en el inventario.</p>
-                                </div>
-                            </td>
-                        </tr>
+                        <tr><td colspan="7" class="text-center py-5 text-muted">No se encontraron productos.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
+
+        {% if productos.has_other_pages %}
+        <div class="card-footer bg-white border-top-0 py-3">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if productos.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ productos.previous_page_number }}&q={{ query|default:'' }}&categoria={{ categoria_id|default:'' }}&oferta={{ oferta|default:'' }}">Anterior</a></li>
+                    {% endif %}
+                    {% for num in productos.paginator.page_range %}
+                        {% if productos.number == num %}
+                            <li class="page-item active"><span class="page-link bg-primary border-primary">{{ num }}</span></li>
+                        {% elif num > productos.number|add:'-3' and num < productos.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}&q={{ query|default:'' }}&categoria={{ categoria_id|default:'' }}&oferta={{ oferta|default:'' }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if productos.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ productos.next_page_number }}&q={{ query|default:'' }}&categoria={{ categoria_id|default:'' }}&oferta={{ oferta|default:'' }}">Siguiente</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
