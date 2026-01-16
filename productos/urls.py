@@ -21,6 +21,8 @@ from productos import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+app_name = 'productos'
+
 urlpatterns = [
     # Manejo de Unidades
     path('unidades/new/', views.unidadesNew, name='unidadesnew'),

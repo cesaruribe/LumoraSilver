@@ -15,7 +15,7 @@
     <!-- Formulario -->
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form method="POST" action="{% url 'productos:categoriasupdate' categorias.id %}" class="needs-validation" novalidate>
+            <form method="POST" action="{% url 'productos:categoriasupdate' categoria.id %}" class="needs-validation" novalidate>
                 {% csrf_token %}
 
                 <div class="mb-3">

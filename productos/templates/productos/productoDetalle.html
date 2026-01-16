@@ -28,93 +28,59 @@
                 <h1 class="display-5 fw-bold text-dark mb-3">{{ producto.nombre }}</h1>
                 <p class="text-muted mb-4 small">Ref: <strong>{{ producto.codigo }}</strong></p>
 
-                <div class="mb-5 p-4 bg-light rounded-4 border-start border-primary border-4">
+                <div class="mb-5 p-4 bg-white border rounded-4 shadow-sm border-start border-4 border-primary">
                     {% if producto.precio_oferta %}
                         <div class="d-flex align-items-center gap-3 mb-2">
                             <span class="h2 fw-bold text-danger mb-0">${{ producto.precio_oferta|floatformat:2|intcomma }}</span>
                             <span class="h4 text-muted text-decoration-line-through mb-0">${{ producto.precio|floatformat:2|intcomma }}</span>
                         </div>
                         <p class="text-danger small fw-bold mb-0">
-                            <i class="fas fa-tag me-1"></i> ¡Ahorras un {{ ahorro_porcentaje|floatformat:0 }}%!
+                            <i class="bi bi-tag-fill me-1"></i> ¡Ahorras un {{ ahorro_porcentaje|floatformat:0 }}%!
                         </p>
                     {% else %}
                         <span class="h2 fw-bold text-dark mb-0">${{ producto.precio|floatformat:2|intcomma }}</span>
                     {% endif %}
                 </div>
 
-                <div class="row g-3 mb-5 text-center">
-                    <div class="col">
-                        <div class="border rounded-3 p-3 bg-white shadow-sm h-100">
-                            <small class="text-muted d-block text-uppercase mb-1" style="font-size: 0.7rem;">Stock</small>
-                            <span class="fw-bold text-dark">{{ producto.stock }} unid.</span>
-                        </div>
-                    </div>
-                    {% if producto.tamano %}
-                    <div class="col">
-                        <div class="border rounded-3 p-3 bg-white shadow-sm h-100">
-                            <small class="text-muted d-block text-uppercase mb-1" style="font-size: 0.7rem;">Tamaño</small>
-                            <span class="fw-bold text-dark">
-                                {{ producto.tamano|floatformat:"-2" }} {% if producto.unidad_tamano %}{{ producto.unidad_tamano.simbolo }}{% endif %}
-                            </span>
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% if producto.grosor %}
-                    <div class="col">
-                        <div class="border rounded-3 p-3 bg-white shadow-sm h-100">
-                            <small class="text-muted d-block text-uppercase mb-1" style="font-size: 0.7rem;">Grosor</small>
-                            <span class="fw-bold text-dark">
-                                {{ producto.grosor|floatformat:"-2" }} {% if producto.unidad_grosor %}{{ producto.unidad_grosor.simbolo }}{% endif %}
-                            </span>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-5">
-                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Descripción de la pieza</h5>
-                    <p class="text-muted lh-lg" style="white-space: pre-line;">{{ producto.descripcion }}</p>
-                </div>
-
                 {% if producto.stock > 0 %}
-                    <div class="d-grid gap-3 mb-4">
+                    <div class="mb-4">
                     {% if user.is_authenticated %}
-                        <form method="post" action="#"> {% csrf_token %}
-                            <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                            <button type="submit" class="btn btn-dark btn-lg w-100 py-3 rounded-pill fw-bold shadow">
-                                <i class="bi bi-bag-plus me-2"></i> AÑADIR A LA BOLSA
-                            </button>
+                        <form method="POST" action="{% url 'carrito:agregar' producto.id %}">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-4 col-md-3">
+                                    <label class="form-label small fw-bold text-muted">CANTIDAD</label>
+                                    <select name="cantidad" class="form-select border-2 rounded-3">
+                                        {% for i in "123456789"|make_list %}
+                                            {% if forloop.counter <= producto.stock %}
+                                                <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-8 col-md-9 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-dark btn-lg w-100 py-3 rounded-pill fw-bold shadow">
+                                        <i class="bi bi-bag-plus me-2"></i> AÑADIR A LA BOLSA
+                                    </button>
+                                </div>
+                            </div>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg w-100 py-3 rounded-pill fw-bold shadow">
-                            <i class="bi bi-person-check me-2"></i> INGRESAR PARA COMPRAR
-                        </a>
-                        <p class="text-center small text-muted">¿Nuevo cliente? Regístrate y gestiona tus pedidos.</p>
+                        <div class="d-grid">
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-lg py-3 rounded-pill fw-bold shadow">
+                                <i class="bi bi-person-check me-2"></i> INGRESAR PARA COMPRAR
+                            </a>
+                            <p class="text-center small text-muted mt-3">Debes estar registrado para añadir joyas a tu bolsa.</p>
+                        </div>
                     {% endif %}
                     </div>
                 {% else %}
                     <button class="btn btn-outline-secondary btn-lg w-100 rounded-pill disabled py-3 fw-bold mb-4">PRODUCTO AGOTADO</button>
                 {% endif %}
 
-                <div class="row g-3 py-4 border-top">
-                    <div class="col-6">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-truck text-primary fs-3"></i>
-                            <div class="lh-1">
-                                <p class="mb-0 fw-bold small">Envío Seguro</p>
-                                <small class="text-muted" style="font-size: 0.7rem;">Entrega en 24/48h</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-shield-check text-primary fs-3"></i>
-                            <div class="lh-1">
-                                <p class="mb-0 fw-bold small">Garantía Lumora</p>
-                                <small class="text-muted" style="font-size: 0.7rem;">Calidad certificada</small>
-                            </div>
-                        </div>
-                    </div>
+                <div class="mb-5">
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3 text-uppercase small">Descripción</h5>
+                    <p class="text-muted lh-lg" style="white-space: pre-line;">{{ producto.descripcion }}</p>
                 </div>
             </div>
         </div>
