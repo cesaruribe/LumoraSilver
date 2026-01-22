@@ -129,8 +129,45 @@ def productosNew(request):
 
 @login_required
 def productosShow(request):
-    productos = Producto.objects.all()
-    return render(request, 'productos/productosShow.html', {'productos': productos})
+    # 1. Obtener todos los productos base
+    productos_list = Producto.objects.all().order_by('-fecha_creacion')
+    categorias = Categoria.objects.all()
+
+    # 2. Capturar parámetros del formulario GET
+    query = request.GET.get('q')
+    categoria_id = request.GET.get('categoria')
+    oferta = request.GET.get('oferta')
+
+    # 3. Aplicar filtros si existen
+    if query:
+        productos_list = productos_list.filter(
+            Q(nombre__icontains=query) | Q(codigo__icontains=query)
+        )
+    
+    if categoria_id:
+        productos_list = productos_list.filter(categoria_id=categoria_id)
+
+    if oferta == 'si':
+        productos_list = productos_list.filter(precio_oferta__isnull=False)
+    elif oferta == 'no':
+        productos_list = productos_list.filter(precio_oferta__isnull=True)
+
+    # 4. Configurar Paginación (ejemplo: 10 productos por página)
+    paginator = Paginator(productos_list, 10)
+    page = request.GET.get('page')
+    productos = paginator.get_page(page)
+
+    # 5. Pasar todo al contexto
+    return render(request, 'productos/productosShow.html', {
+        'productos': productos,
+        'categorias': categorias,
+        'query': query,
+        'categoria_id': categoria_id,
+        'oferta': oferta
+    })
+
+
+
 
 @login_required
 def productosEdit(request, id):

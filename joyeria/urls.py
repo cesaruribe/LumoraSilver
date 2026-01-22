@@ -32,12 +32,14 @@ urlpatterns = [
     path('cuentas/login/', auth_views.LoginView.as_view(
         template_name='cuentas/login.html',
         redirect_authenticated_user=True,
-        next_page='cuentas:perfil'
+        next_page='core:inicio'
+        #next_page='cuentas:perfil'
     ), name='login'),
     path('cuentas/logout/', auth_views.LogoutView.as_view(next_page='inicio'), name='logout'),
 
     # App cuentas
     path('cuentas/', include(('cuentas.urls', 'cuentas'), namespace='cuentas')),
+    path('core/', include(('core.urls', 'core'), namespace='core')),
 ]
 
 # Archivos multimedia en desarrollo
