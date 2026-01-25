@@ -1,12 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from productos.models import UnidadMedida, Categoria, Producto
-from productos.forms import UnidadMedidaForm, CategoriaForm, ProductoForm
+from productos.forms import UnidadMedidaForm, CategoriaForm, ProductoForm, ProductoImagenFormSet
 from django.db import IntegrityError
 from django.db.models import Q 
 from django.core.paginator import Paginator 
 # Importamos el decorador para restringir el acceso
 from django.contrib.auth.decorators import login_required
+
 
 # Vistas para Productos
 #  *************************************************************
@@ -119,13 +120,26 @@ def categoriasDestroy(request, id):
 def productosNew(request):
     if request.method == "POST":
         form = ProductoForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Producto creado.")
+        formset = ProductoImagenFormSet(request.POST, request.FILES) # Captura el set de imágenes
+        
+        if form.is_valid() and formset.is_valid():
+            producto = form.save()
+            # Guardamos el formset asociándolo al producto recién creado
+            imagenes = formset.save(commit=False)
+            for img in imagenes:
+                img.producto = producto
+                img.save()
+            
+            messages.success(request, "Producto y galería creados con éxito.")
             return redirect('productos:productosshow')
     else:
         form = ProductoForm()
-    return render(request, 'productos/productosNew.html', {'form': form})
+        formset = ProductoImagenFormSet()
+    
+    return render(request, 'productos/productosNew.html', {
+        'form': form,
+        'formset': formset
+    })
 
 @login_required
 def productosShow(request):
@@ -167,13 +181,27 @@ def productosShow(request):
     })
 
 
-
-
 @login_required
 def productosEdit(request, id):
     producto = get_object_or_404(Producto, id=id)
-    form = ProductoForm(instance=producto)
-    return render(request, 'productos/productosEdit.html', {'form': form, 'producto': producto})
+    if request.method == "POST":
+        form = ProductoForm(request.POST, request.FILES, instance=producto)
+        formset = ProductoImagenFormSet(request.POST, request.FILES, instance=producto)
+        
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            messages.success(request, "Producto actualizado correctamente.")
+            return redirect('productos:productosshow')
+    else:
+        form = ProductoForm(instance=producto)
+        formset = ProductoImagenFormSet(instance=producto)
+    
+    return render(request, 'productos/productosEdit.html', {
+        'form': form, 
+        'formset': formset, 
+        'producto': producto
+    })
 
 @login_required
 def productosUpdate(request, id):

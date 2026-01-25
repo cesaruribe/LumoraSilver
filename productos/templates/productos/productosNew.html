@@ -4,111 +4,136 @@
 {% block content %}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">
+        <h2 class="mb-0 text-dark fw-bold">
             <i class="fas fa-plus-circle text-primary me-2"></i> Nuevo Producto
         </h2>
-        <a href="{% url 'productos:productosshow' %}" class="btn btn-outline-secondary btn-sm">
+        <a href="{% url 'productos:productosshow' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
             <i class="fas fa-arrow-left me-1"></i> Volver al Listado
         </a>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-            <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
-                {% csrf_token %}
+    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold text-primary"><i class="fas fa-info-circle me-2"></i>Información General</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-uppercase">Código Único <span class="text-danger">*</span></label>
+                                {{ form.codigo }}
+                                {% if form.codigo.errors %}<div class="text-danger small">{{ form.codigo.errors.as_text }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold small text-uppercase">Nombre del Producto <span class="text-danger">*</span></label>
+                                {{ form.nombre }}
+                            </div>
+                        </div>
 
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold small text-uppercase">Código Único <span class="text-danger">*</span></label>
-                        {{ form.codigo }}
-                        {% if form.codigo.errors %}<div class="text-danger small">{{ form.codigo.errors.as_text }}</div>{% endif %}
-                        <div class="form-text">Ej: AN-001, CAD-925.</div>
-                    </div>
-                    <div class="col-md-8">
-                        <label class="form-label fw-bold small text-uppercase">Nombre de la Joya <span class="text-danger">*</span></label>
-                        {{ form.nombre }}
-                        {% if form.nombre.errors %}<div class="text-danger small">{{ form.nombre.errors.as_text }}</div>{% endif %}
-                    </div>
-                </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase">Descripción</label>
+                            {{ form.descripcion }}
+                        </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold small text-uppercase">Descripción Detallada</label>
-                    {{ form.descripcion }}
-                    <div class="form-text">Describe el material, el acabado y detalles especiales.</div>
-                </div>
-
-                <div class="row p-3 rounded mb-4" style="background-color: #f8f9fa; border: 1px dashed #dee2e6;">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                        <label class="form-label fw-bold text-primary small text-uppercase">Precio Base ($)</label>
-                        {{ form.precio }}
-                        {% if form.precio.errors %}<div class="text-danger small">{{ form.precio.errors.as_text }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-danger small text-uppercase">Precio Popular/Oferta ($)</label>
-                        {{ form.precio_oferta }}
-                        <div class="form-text text-muted small">Si llenas este campo, el sistema mostrará el precio base tachado.</div>
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold small text-uppercase">Tamaño / Largo</label>
-                        {{ form.tamano }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold small text-uppercase">Unidad</label>
-                        {{ form.unidad_tamano }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold small text-uppercase">Grosor</label>
-                        {{ form.grosor }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold small text-uppercase">Unidad</label>
-                        {{ form.unidad_grosor }}
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small text-uppercase">Categoría <span class="text-danger">*</span></label>
-                        {{ form.categoria }}
-                        {% if form.categoria.errors %}<div class="text-danger small">{{ form.categoria.errors.as_text }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small text-uppercase">Fotografía del Producto</label>
-                        {{ form.imagen }}
-                        <div class="form-text">Se recomienda fondo blanco o neutro.</div>
-                    </div>
-                </div>
-
-                <div class="row align-items-center mb-4">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold small text-uppercase">Stock Inicial</label>
-                        {{ form.stock }}
-                    </div>
-                    <div class="col-md-8">
-                        <div class="form-check form-switch mt-4">
-                            {{ form.activo }}
-                            <label class="form-check-label fw-bold text-success" for="{{ form.activo.id_for_label }}">
-                                Publicar inmediatamente en el catálogo
-                            </label>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Precio Base</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    {{ form.precio }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Precio Oferta (Opcional)</label>
+                                <div class="input-group text-danger">
+                                    <span class="input-group-text bg-danger-subtle text-danger border-danger-subtle">$</span>
+                                    {{ form.precio_oferta }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <hr class="my-4">
-
-                <div class="d-flex justify-content-end gap-3">
-                    <a href="{% url 'productos:productosshow' %}" class="btn btn-light px-4 border">
-                        Descartar
-                    </a>
-                    <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
-                        <i class="fas fa-save me-2"></i> Crear Producto
-                    </button>
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold text-success"><i class="fas fa-images me-2"></i>Galería de Imágenes Adicionales</h5>
+                    </div>
+                    <div class="card-body p-4 bg-light-subtle">
+                        {{ formset.management_form }}
+                        <div class="row g-3">
+                            {% for form_img in formset %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card h-100 border-dashed p-2 text-center bg-white border">
+                                    <div class="card-body p-2">
+                                        <label class="small fw-bold text-muted mb-2">Imagen {{ forloop.counter }}</label>
+                                        {{ form_img.imagen }}
+                                        {% if form_img.id %}{{ form_img.id }}{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="alert alert-info mt-3 mb-0 small rounded-3">
+                            <i class="fas fa-lightbulb me-2"></i> <strong>Tip de Marketing:</strong> Sube fotos desde diferentes ángulos para que el cliente aprecie los acabados de la joya.
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase">Imagen de Portada (Principal)</label>
+                            <div class="border rounded-3 p-3 bg-light text-center">
+                                {{ form.imagen }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase">Categoría</label>
+                            {{ form.categoria }}
+                        </div>
+
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label class="form-label fw-bold small text-uppercase text-truncate">Tamaño</label>
+                                {{ form.tamano }}
+                                {{ form.unidad_tamano }}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold small text-uppercase text-truncate">Grosor</label>
+                                {{ form.grosor }}
+                                {{ form.unidad_grosor }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase">Stock Inicial</label>
+                            {{ form.stock }}
+                        </div>
+
+                        <div class="form-check form-switch mb-4">
+                            {{ form.activo }}
+                            <label class="form-check-label fw-bold text-success" for="{{ form.activo.id_for_label }}">Publicar en Catálogo</label>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg py-3 rounded-pill fw-bold shadow-sm">
+                                <i class="fas fa-save me-2"></i> CREAR PRODUCTO
+                            </button>
+                            <a href="{% url 'productos:productosshow' %}" class="btn btn-light rounded-pill">Descartar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 {% endblock %}

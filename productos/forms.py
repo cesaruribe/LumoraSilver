@@ -1,5 +1,6 @@
 from django import forms
-from .models import UnidadMedida, Categoria, Producto
+from .models import UnidadMedida, Categoria, Producto, ProductoImagen
+from django.forms import inlineformset_factory 
 
 # Formulario para Unidad de Medida
 class UnidadMedidaForm(forms.ModelForm):
@@ -42,3 +43,12 @@ class ProductoForm(forms.ModelForm):
             'stock': forms.NumberInput(attrs={'class': 'form-control'}),
             'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+# Creamos el conjunto de formularios para las imágenes
+ProductoImagenFormSet = inlineformset_factory(
+    Producto, 
+    ProductoImagen, 
+    fields=['imagen'], 
+    extra=3,      # Número de espacios vacíos para nuevas imágenes
+    can_delete=True # Permite borrar imágenes en la edición
+)

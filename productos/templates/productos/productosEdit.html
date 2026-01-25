@@ -1,116 +1,123 @@
 {% extends 'core/menu.html' %}
 {% load static %}
-{% load humanize %}
 
 {% block content %}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">
-            <i class="fas fa-edit me-2"></i> Editar Producto: {{ producto.nombre }}
+        <h2 class="mb-0 text-dark fw-bold">
+            <i class="fas fa-edit text-warning me-2"></i> Editar: {{ producto.nombre }}
         </h2>
-        <a href="{% url 'productos:productosshow' %}" class="btn btn-outline-secondary btn-sm">
+        <a href="{% url 'productos:productosshow' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
             <i class="fas fa-arrow-left me-1"></i> Volver
         </a>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <form method="POST" action="{% url 'productos:productosupdate' producto.id %}" enctype="multipart/form-data" class="needs-validation" novalidate>
-                {% csrf_token %}
-
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">Código <span class="text-danger">*</span></label>
-                        {{ form.codigo }}
-                        {% if form.codigo.errors %}<div class="text-danger small">{{ form.codigo.errors.as_text }}</div>{% endif %}
-                    </div>
-
-                    <div class="col-md-8 mb-3">
-                        <label class="form-label fw-bold">Nombre del Producto <span class="text-danger">*</span></label>
-                        {{ form.nombre }}
-                        {% if form.nombre.errors %}<div class="text-danger small">{{ form.nombre.errors.as_text }}</div>{% endif %}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Descripción</label>
-                    {{ form.descripcion }}
-                </div>
-
-                <div class="row bg-light p-3 rounded mb-3 border">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                        <label class="form-label fw-bold text-primary">Precio Normal ($)</label>
-                        {{ form.precio }}
-                        {% if form.precio.errors %}<div class="text-danger small">{{ form.precio.errors.as_text }}</div>{% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-danger">Precio de Oferta ($)</label>
-                        {{ form.precio_oferta }}
-                        <small class="text-muted">Dejar vacío si no hay descuento.</small>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-bold">Tamaño</label>
-                        {{ form.tamano }}
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-bold">Unidad Tamaño</label>
-                        {{ form.unidad_tamano }}
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-bold">Grosor</label>
-                        {{ form.grosor }}
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-bold">Unidad Grosor</label>
-                        {{ form.unidad_grosor }}
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Categoría</label>
-                        {{ form.categoria }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Imagen</label>
-                        {{ form.imagen }}
-                        {% if producto.imagen %}
-                        <div class="mt-2">
-                            <img src="{{ producto.imagen.url }}" alt="Actual" class="img-thumbnail" style="height: 80px;">
-                            <span class="small text-muted ms-2">Imagen actual</span>
+    <form method="POST" action="{% url 'productos:productosupdate' producto.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-uppercase">Código</label>
+                                {{ form.codigo }}
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold small text-uppercase">Nombre del Producto</label>
+                                {{ form.nombre }}
+                            </div>
                         </div>
-                        {% endif %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase">Descripción del Producto</label>
+                            {{ form.descripcion }}
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Precio</label>
+                                {{ form.precio }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-uppercase">Precio Oferta</label>
+                                {{ form.precio_oferta }}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row align-items-center">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-bold">Stock en Inventario</label>
-                        {{ form.stock }}
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h5 class="mb-0 fw-bold text-success"><i class="fas fa-images me-2"></i>Gestión de Galería</h5>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="form-check mt-4">
+                    <div class="card-body p-4 bg-light-subtle">
+                        {{ formset.management_form }}
+                        <div class="row g-4">
+                            {% for form_img in formset %}
+                            <div class="col-md-6">
+                                <div class="card h-100 shadow-sm border-0 rounded-3">
+                                    <div class="card-body">
+                                        {% if form_img.instance.pk %}
+                                            <div class="text-center mb-3">
+                                                <img src="{{ form_img.instance.imagen.url }}" class="img-thumbnail" style="height: 120px; object-fit: cover;">
+                                            </div>
+                                            <div class="form-check text-danger mb-2">
+                                                {{ form_img.DELETE }}
+                                                <label class="form-check-label fw-bold small">¿Eliminar esta imagen?</label>
+                                            </div>
+                                        {% else %}
+                                            <label class="small fw-bold text-muted mb-2">Añadir nueva imagen</label>
+                                        {% endif %}
+                                        
+                                        {{ form_img.imagen }}
+                                        {% for hidden in form_img.hidden_fields %}
+                                            {{ hidden }}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <div class="mb-4 text-center">
+                            <label class="form-label fw-bold small text-uppercase d-block">Portada Actual</label>
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" class="img-fluid rounded-3 mb-3 border" style="max-height: 200px;">
+                            {% endif %}
+                            {{ form.imagen }}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase">Categoría</label>
+                            {{ form.categoria }}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-uppercase">Stock Disponible</label>
+                            {{ form.stock }}
+                        </div>
+
+                        <div class="form-check form-switch mb-4">
                             {{ form.activo }}
-                            <label class="form-check-label fw-bold">Producto Visible al Público</label>
+                            <label class="form-check-label fw-bold" for="{{ form.activo.id_for_label }}">Producto Activo</label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg py-3 rounded-pill fw-bold shadow-sm">
+                                <i class="fas fa-sync-alt me-2"></i> ACTUALIZAR PRODUCTO
+                            </button>
+                            <a href="{% url 'productos:productosshow' %}" class="btn btn-outline-secondary rounded-pill">Cancelar cambios</a>
                         </div>
                     </div>
                 </div>
-
-                <hr>
-
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="{% url 'productos:productosshow' %}" class="btn btn-secondary px-4">
-                        Cancelar
-                    </a>
-                    <button type="submit" class="btn btn-primary px-4">
-                        <i class="fas fa-save me-1"></i> Guardar Cambios
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 {% endblock %}

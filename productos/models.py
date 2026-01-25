@@ -85,3 +85,18 @@ class Producto(models.Model):
         verbose_name = 'Producto'
         verbose_name_plural = 'Productos'
         unique_together = ['nombre', 'categoria', 'codigo']
+
+# Tabla de Imágenes de Galería para Productos
+class ProductoImagen(models.Model):
+    producto = models.ForeignKey(
+        Producto, 
+        on_delete=models.CASCADE, 
+        related_name='imagenes' # Esto permite acceder como producto.imagenes.all()
+    )
+    imagen = models.ImageField(upload_to='productos/galeria/')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'producto_imagen'
+        verbose_name = "Imagen de Galería"
+        verbose_name_plural = "Galería de Imágenes"
